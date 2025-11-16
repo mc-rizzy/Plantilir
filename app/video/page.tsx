@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useSpeechToText } from "./speech";
 import Script from 'next/script';
-import { scrapedData } from './scrapedData.tsx';
+import { scrapedData } from '../../public/scrapedData';
 
 import * as THREE from 'three';
 

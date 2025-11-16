@@ -1,5 +1,7 @@
 node_modules
 
+public/scrapedData.tsx
+
 scrapedData.tsx
 git rm --cached scrapedData.tsx
 
