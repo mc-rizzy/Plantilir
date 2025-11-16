@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useSpeechToText } from "./speech";
 import Script from 'next/script';
+import { scrapedData } from './scrapedData.tsx';
 
 import * as THREE from 'three';
 
@@ -26,16 +27,6 @@ export default function VideoPage() {
 	let animationId = useRef<number | null>(null);
 
 	let profileList = [] as any;
-	let testData = [
-		{name: 'billyBobJones', hobbies: 'eating'},
-		// {name: 'sarah', hobbies: 'feasting'},
-		// {name: 'neek', hobbies: 'pooping'},
-		// {name: 'sal', hobbies: 'anime'},
-		// {name: 'ellie', hobbies: 'asdf'},
-		// {name: 'mark', hobbies: 'nah'},
-		// {name: 'john', hobbies: 'idk'},
-		// {name: 'dudeyMcDudeMan', hobbies: 'frfr'},
-	];
 
 	const scrollData = {
 		dataListScroll: 0 as any,
@@ -621,7 +612,7 @@ export default function VideoPage() {
 		createScene();
 		// createCube(1);
 
-		loadData(testData);
+		loadData(scrapedData);
 		animate();
 
 		let conversation = "Hello, How are you doing? I'm doing well, I just got back from my trip to SodaCity Beach. My work phone number is 123456789 and my middle name is BobbyMcBob. My favorite food is donuts and I work at Pipes Inc. I am actually the Senior manager of cooling."
