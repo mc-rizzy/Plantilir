@@ -1,6 +1,7 @@
 node_modules
 
-
+scrapedData.tsx
+git rm --cached scrapedData.tsx
 
 app/video/scrapedData.tsx
 git reset app/video/scrapedData.tsx
