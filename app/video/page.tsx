@@ -4,6 +4,9 @@ import { useEffect, useRef } from 'react';
 import { useSpeechToText } from "./speech";
 import Script from 'next/script';
 import { scrapedData } from '../../public/scrapedData';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { FontLoader, Font } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 import * as THREE from 'three';
 
@@ -17,7 +20,8 @@ export default function VideoPage() {
 	const dataList = useRef<HTMLDivElement>(null);
 	const infoList = useRef<HTMLDivElement>(null);
 	const nodeVelocities: Record<string, THREE.Vector3> = {};
-	const ignoreParameters = ['id', 'threeShape', 'connections', 'conversation'] as any;
+	const ignoreParameters = ['id', 'threeShape', 'connections', 'conversation', 'nameTag'] as any;
+	const listenButton = useRef<HTMLButtonElement>(null);
 
 	const { text, listening, awake, startListen, stopListen } = useSpeechToText({
 		silenceMs: 2500,   // auto-stop after 2.5s silence
@@ -25,6 +29,8 @@ export default function VideoPage() {
 	});
 
 	let animationId = useRef<number | null>(null);
+	let SelectedID = null as any;
+	let monkeyModel = null as any;
 
 	let profileList = [] as any;
 
@@ -89,7 +95,7 @@ export default function VideoPage() {
 			three.camera.updateProjectionMatrix();
 		}
 	}
-
+/*
 	function setUpCamera(){
 
 		landmarkData.hands = new window.Hands({
@@ -110,7 +116,7 @@ export default function VideoPage() {
 
 		landmarkData.hands.onResults((results: any) => {
 			ctx.save();
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			// ctx.clearRect(0, 0, canvas.width, canvas.height);
 			ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
 
 			if (results.multiHandLandmarks) {
@@ -192,9 +198,296 @@ export default function VideoPage() {
 
 		cameraRef.current = landmarkData.camera;
 		landmarkData.camera.start();
+
+
+
+
+
+
+
+
+
+
+		// if (!window.FaceMesh || !window.Camera) return;
+
+		// let video = videoRef.current!;
+
+		// let faceMesh = new window.FaceMesh({
+		// 	locateFile: (file: string) =>
+		// 		`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
+		// });
+
+		// faceMesh.setOptions({
+		// 	maxNumFaces: 1,
+		// 	refineLandmarks: true,
+		// 	minDetectionConfidence: 0.5,
+		// 	minTrackingConfidence: 0.5,
+		// });
+
+		// faceMesh.onResults((results: any) => {
+		// 	// ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		// // Draw mirrored video
+		// ctx.save();
+		// ctx.scale(-1, 1);
+		// ctx.drawImage(results.image, -canvas.width, 0, canvas.width, canvas.height);
+		// ctx.restore();
+
+		// // Draw glowing dots
+		// if (!results.multiFaceLandmarks?.length) return;
+
+		// let landmarks = results.multiFaceLandmarks[0];
+
+		// landmarks.forEach((lm: any) => {
+		// 	const x = canvas.width - lm.x * canvas.width;
+		// 	const y = lm.y * canvas.height;
+
+		// 	const gradient = ctx.createRadialGradient(x, y, 0, x, y, 10);
+		// 	gradient.addColorStop(0, "rgba(0,255,255,1)");
+		// 	gradient.addColorStop(1, "rgba(0,255,255,0)");
+
+		// 	ctx.fillStyle = gradient;
+		// 	ctx.beginPath();
+		// 	ctx.arc(x, y, 5, 0, Math.PI * 2);
+		// 	ctx.fill();
+		// });
+		// });
+
+		// const camera = new window.Camera(video, {
+		// onFrame: async () => {
+		// 		await faceMesh.send({ image: video });
+		// 	},
+		// 	width: 640,
+		// 	height: 480,
+		// });
+
+		// camera.start();
 		
 
 	}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+	function setUpCamera() {
+		const canvas = canvasRef.current!;
+		const ctx = canvas.getContext("2d")!;
+		const video = videoRef.current!;
+
+		let cubeObject = profileList[0].threeShape;
+
+		// storage for latest results
+		let latestHands = null as any;
+		let latestFace = null as any;
+
+		// ============================================================
+		// 1. HANDS MODEL
+		// ============================================================
+		const hands = new window.Hands({
+			locateFile: (file: string) =>
+			`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+		});
+
+		hands.setOptions({
+			maxNumHands: 2,
+			modelComplexity: 1,
+			minDetectionConfidence: 0.7,
+			minTrackingConfidence: 0.5,
+		});
+
+		hands.onResults((results: any) => {
+			latestHands = results; // ← store only
+		});
+
+		// ============================================================
+		// 2. FACE MESH MODEL
+		// ============================================================
+		const faceMesh = new window.FaceMesh({
+			locateFile: (file: string) =>
+			`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
+		});
+
+		faceMesh.setOptions({
+			maxNumFaces: 1,
+			refineLandmarks: true,
+			minDetectionConfidence: 0.5,
+			minTrackingConfidence: 0.5,
+		});
+
+		faceMesh.onResults((results: any) => {
+			latestFace = results; // ← store only
+		});
+
+		// ============================================================
+		// 3. ONE CAMERA THAT FEEDS BOTH
+		// ============================================================
+		const camera = new window.Camera(video, {
+			onFrame: async () => {
+			await hands.send({ image: video });
+			await faceMesh.send({ image: video });
+
+			drawFrame(); // ← draw everything here
+			},
+			width: 640,
+			height: 480,
+		});
+
+		camera.start();
+
+		// ============================================================
+		// 4. THE RENDER PIPELINE (the FIX)
+		// ============================================================
+		function drawFrame() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			//
+			// 1. MIRROR CONTEXT FOR EVERYTHING
+			//
+			ctx.save();
+			ctx.scale(-1, 1);
+			ctx.translate(-canvas.width, 0);
+
+			//
+			// 2. DRAW VIDEO (mirrored!)
+			//
+			ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+			//
+			// 3. DRAW HAND LANDMARKS (mirrored!)
+			//
+			if (latestHands?.multiHandLandmarks) {
+				const results = latestHands;
+
+				// Your pinch + cube logic still works because it's in canvas space
+				let chosenHand = "Left";
+				let data = null;
+
+				for (let i = 0; i < results.multiHandedness.length; i++) {
+				if (results.multiHandedness[i].label === chosenHand) {
+					data = results.multiHandLandmarks[results.multiHandedness[i].index];
+				}
+				}
+
+				if (data != null && profileList.length > 0 && three.camera) {
+				let lm = results.multiHandLandmarks[0][8];
+				let lm2 = results.multiHandLandmarks[0][4];
+
+				// SAME coordinates (canvas now mirrored)
+				const flat = {
+					x1: lm.x * canvas.width,
+					y1: lm.y * canvas.height,
+					x2: lm2.x * canvas.width,
+					y2: lm2.y * canvas.height,
+				};
+
+				ctx.lineWidth = 10;
+				ctx.beginPath();
+				ctx.moveTo(flat.x1, flat.y1);
+				ctx.lineTo(flat.x2, flat.y2);
+				ctx.stroke();
+
+				let dist = Math.hypot(flat.x1 - flat.x2, flat.y1 - flat.y2);
+				landmarkData.smoothing.pinchDist.push(dist);
+
+				const avgDist = listAverage(landmarkData.smoothing.pinchDist);
+				cubeObject.rotation.x = avgDist / 100;
+				cubeObject.rotation.y = avgDist / 100;
+				cubeObject.rotation.z = avgDist / 100;
+
+				const projectionData = projectLandmark(lm);
+
+				let pinchedDist = 100 + (0.9 - projectionData.ndcZ) * 720 + 20;
+
+				if (dist < pinchedDist) {
+					let newMove = smoothMove(
+					profileList[0].threeShape,
+					projectionData.ndcX,
+					projectionData.ndcY,
+					projectionData.ndcZ
+					);
+
+					let ndc = new THREE.Vector3(
+					newMove.avgX,
+					newMove.avgY,
+					newMove.avgZ
+					);
+
+					ndc.unproject(three.camera);
+					cubeObject.position.copy(ndc);
+				}
+				}
+
+				// draw all hands
+				for (const lm of results.multiHandLandmarks) {
+				window.drawConnectors(ctx, lm, window.HAND_CONNECTIONS, {
+					color: "#00FF00",
+					lineWidth: 2,
+				});
+				window.drawLandmarks(ctx, lm, {
+					color: "#FF0000",
+					lineWidth: 1,
+				});
+				}
+			}
+
+			//
+			// 4. DRAW FACE LANDMARKS (mirrored!)
+			//
+			if (latestFace?.multiFaceLandmarks) {
+				const landmarks = latestFace.multiFaceLandmarks[0];
+
+				if(landmarks)
+				landmarks.forEach((lm: any) => {
+					const x = lm.x * canvas.width;     // <— NO canvas.width - x
+					const y = lm.y * canvas.height;
+
+					const g = ctx.createRadialGradient(x, y, 0, x, y, 10);
+					g.addColorStop(0, "rgba(0,255,255,1)");
+					g.addColorStop(1, "rgba(0,255,255,0)");
+
+					ctx.fillStyle = g;
+					ctx.beginPath();
+					ctx.arc(x, y, 5, 0, Math.PI * 2);
+					ctx.fill();
+				});
+			}
+
+			//
+			// 5. RESTORE (leave canvas normal for next frame)
+			//
+			ctx.restore();
+		}
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	function createScene(){
 
@@ -314,6 +607,7 @@ export default function VideoPage() {
 		}
 	}
 	function loadInfo(dataID:any){
+		SelectedID = dataID;
 		let tempData = findId(dataID);
 
 		if(!infoList.current)
@@ -356,7 +650,16 @@ export default function VideoPage() {
 			}).join(' ');
 
 			newItem.innerHTML = `${tempKeyName}: ${tempData}`;
-			if(infoList.current) infoList.current.appendChild(newItem);
+			if(tempKeyName.toLowerCase().includes('linkedin') || tempKeyName.toLowerCase().includes('instagram') || tempKeyName.toLowerCase().includes('github') || tempKeyName.toLowerCase().includes('http')){
+				let linkItem  = document.createElement("a");
+				linkItem.href = ''+tempData;
+				linkItem.target = '_blank';
+				linkItem.appendChild(newItem);
+				if(infoList.current) infoList.current.appendChild(linkItem);
+
+			}else{
+				if(infoList.current) infoList.current.appendChild(newItem);
+			}
 		}else{
 			for (let key in tempData) {
 				if(!ignoreParameters.includes(key))	
@@ -365,7 +668,20 @@ export default function VideoPage() {
 		}
 	}
 
+	async function loadErryThang(tempData:any){
+		await loadModel(tempData);
+		if(!three.scene) return;
+
+		let color = 0xFFFFFF;
+		let light = new THREE.AmbientLight(color, 5);
+		three.scene.add(light);
+
+		let light2 = new THREE.PointLight(color, 10);
+		light2.position.set(0, 1, 3);
+		three.scene.add(light2);
+	}
 	async function loadData(tempData:any){
+		
 		for(let i = 0; i < tempData.length; i++){
 			await createProfile(tempData[i]);	
 		}
@@ -378,7 +694,11 @@ export default function VideoPage() {
 		else
 			data = await createInfo(data);
 
-		data = add3dProfile(data);
+		data = await add3dProfile(data);
+		if (data.nameTag) {
+			data.nameTag.position.x += 0.5;
+			data.nameTag.position.y += 0.2;
+		}
 		data.id = addPerson(data.name);
 
 		profileList.push(data);
@@ -386,12 +706,13 @@ export default function VideoPage() {
 
 
 
-	function add3dProfile(tempData: any){
+	// import * as THREE from 'three';
+	// import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
+	// import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 
-		var tempGeometry = new THREE.BoxGeometry(1, 1, 1);
-		var tempMaterial = new THREE.MeshBasicMaterial({ color: `rgb(${Math.round(Math.random()*255)},${Math.round(Math.random()*255)},${Math.round(Math.random()*255)})` });
-		var tempCube = new THREE.Mesh(tempGeometry, tempMaterial);
-
+	
+	async function add3dProfile(tempData: any) {
+		var tempCube = monkeyModel.clone();
 		tempCube.position.x = Math.random();
 		tempCube.position.y = Math.random();
 		tempCube.position.z = Math.random();
@@ -401,143 +722,132 @@ export default function VideoPage() {
 		three.objects.push(tempCube);
 
 		tempData.threeShape = tempCube;
-		if(three.scene)	three.scene.add(tempData.threeShape);
+		if (three.scene) three.scene.add(tempData.threeShape);
 
+		let material = new THREE.MeshStandardMaterial({ color: 0xdc24e2 });
+		const loader = new FontLoader();
+
+		// Wrap loader.load in a Promise
+		const font: Font = await new Promise((resolve, reject) => {
+			loader.load(
+				'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',
+				(font) => resolve(font),
+				undefined,
+				(err) => reject(err)
+				
+			);
+		});
+
+		// Now the font is fully loaded
+		const geometry = new TextGeometry(tempData.name, {
+			font: font,
+			size: 0.1,
+			depth: 0.01,
+			bevelEnabled: false,
+			bevelThickness: 0.01,
+			bevelSize: 0.01,
+			bevelSegments: 3,
+			curveSegments: 12,
+		});
+
+		let textMesh = new THREE.Mesh(geometry, material);
+		geometry.center();
+
+		textMesh.position.set(tempCube.position.x + 0.2, tempCube.position.y, tempCube.position.z);
+		textMesh.rotation.set(0, Math.PI, 0);
+		tempData.nameTag = textMesh;
+		if (three.scene) three.scene.add(tempData.nameTag);
+
+		console.log(tempData.nameTag)
 		return tempData;
 	}
-	
-	function animateThreeShapes(selected:any = null){
-		if(!profileList) return;
-		for(let i = 0; i < profileList.length; i++){
-			let x = profileList[i].threeShape.position.x;
-			let y = profileList[i].threeShape.position.y;
-			let z = profileList[i].threeShape.position.z;
 
-			if(profileList[i].name=="Mac") {
-				console.log(profileList[i].threeShape.position)
-				profileList[i].threeShape.position.x = Math.random();
-				// if(three.scene) three.scene.remove(profileList[i].threeShape);
+
+	function animateThreeShapes(selectedID: any = null) {
+		if (!profileList) return;
+
+		const minDistance = 4.0;       // minimum distance for repulsion
+		const maxAttractDistance = 10; // distance scaling for attraction
+		const attractionBase = 0.1;   // base attraction factor
+		const repulsionBase = 0.2;    // base repulsion factor
+		const damping = 0.1;           // smooth movement factor
+
+		for (let i = 0; i < profileList.length; i++) {
+			let shape = profileList[i].threeShape;
+			let pos = shape.position;
+
+			let forceX = 0;
+			let forceY = 0;
+			let forceZ = 0;
+
+			// Attraction to connections
+			const connections = profileList[i].connections;
+			for (let t = 0; t < connections.length; t++) {
+			const targetShape = findId(connections[t].id).threeShape;
+			const targetPos = targetShape.position;
+
+			const dx = targetPos.x - pos.x;
+			const dy = targetPos.y - pos.y;
+			const dz = targetPos.z - pos.z;
+			const distance = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001;
+
+			// Stronger attraction when farther away
+			const attraction = attractionBase * (distance / maxAttractDistance);
+
+			forceX += (dx / distance) * attraction;
+			forceY += (dy / distance) * attraction;
+			forceZ += (dz / distance) * attraction;
 			}
 
-			let connections = profileList[i].connections;
+			// Repulsion from all other shapes
+			for (let j = 0; j < profileList.length; j++) {
+			if (i === j) continue;
+			const other = profileList[j].threeShape;
+			const dx = pos.x - other.position.x;
+			const dy = pos.y - other.position.y;
+			const dz = pos.z - other.position.z;
+			const distance = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001;
 
-			let avgX = 0;
-			let avgY = 0;
-			let avgZ = 0;
-			for(let t = 0; t < connections.length; t++){
-				let connection = findId(connections[t].id).threeShape.position;
-				avgX+=connection.x;
-				avgY+=connection.y;
-				avgZ+=connection.z;
-
-				let dist = Math.sqrt( (connection.x-x)*(connection.x-x) + (connection.y-y)*(connection.y-y) + (connection.z-z)*(connection.z-z) );
-				if(dist > 0.3){
-					// x= x+((connection.x-x)*0.1);
-					// y= y+((connection.y-y)*0.1);
-					// z= z+((connection.z-z)*0.1);
-
-					x+= ((connection.x-x)*0.5);
-					y+= ((connection.y-y)*0.5);
-					z+= ((connection.z-z)*0.5);
-				}
+			if (distance < minDistance) {
+				// Stronger repulsion when closer
+				const repulse = repulsionBase * ((minDistance - distance) / distance);
+				forceX += dx * repulse;
+				forceY += dy * repulse;
+				forceZ += dz * repulse;
+			}
 			}
 
-			// x = x+(avgX-x)/5;
-			// y = y+(avgY-y)/5;
-			// z = z+(avgZ-z)/5;
+			// Smoothly update position using damping
+			pos.x += forceX * damping;
+			pos.y += forceY * damping;
+			pos.z += forceZ * damping;
 
-			for(let t = 0; t < profileList.length; t++){
-				let shape = profileList[i].threeShape.position;
+			// let avgs = smoothMove(shape, pos.x + forceX * damping, pos.y + forceY * damping, pos.z + forceZ * damping);
+			// pos.x = avgs['avgX'];
+			// pos.y = avgs['avgY'];
+			// pos.z = avgs['avgZ'];
 
-				let dist = Math.sqrt( (shape.x-x)*(shape.x-x) + (shape.y-y)*(shape.y-y) + (shape.z-z)*(shape.z-z) );
-				if(dist < 100){
-					// x+= ((shape.x-x)*1.5);
-					// y+= ((shape.y-y)*1.5);
-					// z+= ((shape.z-z)*1.5);
+			if(pos.z > 2) pos.z = 2;
 
-
-					// x+= ((1/dist)*0.1);
-					// y+= ((1/dist)*0.1);
-					// z+= ((1/dist)*0.1);
-				}
+			if(profileList[i].nameTag){
+				profileList[i].nameTag.position.x = pos.x;
+				profileList[i].nameTag.position.y = pos.y+1;
+				profileList[i].nameTag.position.z = pos.z;
 			}
-			
-			if(z > 2) z = 2;
-			profileList[i].threeShape.position.x = x;
-			profileList[i].threeShape.position.y = y;
-			profileList[i].threeShape.position.z = z;
-			
 		}
+
+		
+		if(selectedID){
+			let item = findId(selectedID);
+			let shape = item.threeShape.position;
+
+			shape.x*=0.9;
+			shape.y*=0.9;
+			shape.z*=0.9;
+		}
+
+		
 	}
-
-
-/*
-	function animateThreeShapes(selected:any = null) {
-		const CLUSTER_PULL = 0.05;      // pull nodes toward cluster center
-		const REPULSION = 10;          // repulsion inside cluster
-		const MIN_DISTANCE = 1;
-		const DAMPING = 0.85;
-		const MAX_STEP = 3;
-
-		// ---- 1. gather nodes by cluster ----
-		const clusterMap: Record<string, THREE.Vector3[]> = {};
-
-		for (const node of profileList) {
-			const c = node.cluster ?? "_none_";
-			if (!clusterMap[c]) clusterMap[c] = [];
-			clusterMap[c].push(node.threeShape.position);
-			if (!nodeVelocities[node.id]) nodeVelocities[node.id] = new THREE.Vector3();
-		}
-
-		// ---- 2. compute cluster centers ----
-		const clusterCenters: Record<string, THREE.Vector3> = {};
-		for (const cluster in clusterMap) {
-			let sum = new THREE.Vector3();
-			for (const pos of clusterMap[cluster]) sum.add(pos);
-			clusterCenters[cluster] = sum.divideScalar(clusterMap[cluster].length);
-		}
-
-		// ---- 3. apply simple forces ----
-		for (const node of profileList) {
-			const pos = node.threeShape.position;
-			const vel = nodeVelocities[node.id];
-			const cluster = node.cluster ?? "_none_";
-
-			let force = new THREE.Vector3();
-
-			// (a) attraction toward cluster center
-			const center = clusterCenters[cluster];
-			const toCenter = new THREE.Vector3().subVectors(center, pos);
-			force.add(toCenter.multiplyScalar(CLUSTER_PULL));
-
-			// (b) repulsion from nodes in same cluster (keeps things spaced)
-			for (const otherPos of clusterMap[cluster]) {
-				if (otherPos === pos) continue;
-				const dir = new THREE.Vector3().subVectors(pos, otherPos);
-				const dist = Math.max(dir.length(), MIN_DISTANCE);
-				dir.normalize().multiplyScalar(REPULSION / (dist * dist));
-				force.add(dir);
-			}
-
-			// (c) apply velocity + damping
-			vel.add(force);
-			vel.multiplyScalar(DAMPING);
-
-			// (d) smooth clamp on motion
-			if (vel.length() > MAX_STEP) vel.setLength(MAX_STEP);
-
-			pos.add(vel);
-		}
-	}
-*/
-
-
-
-
-
-
-
-
 
 
 	function scrollDataList(e:any){
@@ -591,13 +901,44 @@ export default function VideoPage() {
 		// 	object.rotateZ(0.01);
 		// });
 
-		animateThreeShapes();
+		animateThreeShapes(SelectedID);
 		handleScrolls();
 	}
 
+	async function loadModel(tempData:any){
+		let loader = new GLTFLoader();
+		loader.load('/Monkey.glb', (gltf) => {
+			let model: any | null;
+			model = gltf.scene;
+			model.scale.set(0.7,0.8,0.55);
+			
+			let box = new THREE.Box3();
+			box.setFromObject(model);
+			let size = new THREE.Vector3();
+			box.getSize(size);
+			
+			model.geometry = {
+				parameters: {
+					height: Math.floor(2.87*100)/100,
+					width: Math.floor(size.x*100)/100,
+					depth: Math.floor(size.z*100)/100,
+					depthOffset: 0.6
+				}
+			};
 
+			monkeyModel = model;
+			loadData(tempData)
+		});
+	}
 
-
+	function toggleListen(){
+		if(listening)
+			stopListen();
+		else
+			startListen();
+		console.log(listening);
+		console.log(text)
+	}
 
 
 
@@ -611,21 +952,13 @@ export default function VideoPage() {
 
 		createScene();
 		// createCube(1);
+		
 
-		loadData(scrapedData);
+		loadErryThang(scrapedData);
 		animate();
 
 		let conversation = "Hello, How are you doing? I'm doing well, I just got back from my trip to SodaCity Beach. My work phone number is 123456789 and my middle name is BobbyMcBob. My favorite food is donuts and I work at Pipes Inc. I am actually the Senior manager of cooling."
 		createProfile({name: 'Mac', hobbies:'racing cars', id:'78666-23145', conversation: conversation});
-
-
-		window.setTimeout(function(){
-			for(let i = 0; i < profileList.length; i++){
-				profileList[i].threeShape.position.x = Math.random()*10 - 5;
-				profileList[i].threeShape.position.y = Math.random()*10 - 5;
-				profileList[i].threeShape.position.z = Math.random()*10 - 5;
-			}
-		},1000);
 
 		startListen();
 
@@ -641,16 +974,8 @@ export default function VideoPage() {
 	}, []);
 
 
-
-	// check Listening
-	// Fix box animations
+	// voice
 	// add lines between connections
-
-	// Get judges information
-	// hand controls
-
-	// Nicer UI
-
 
 	return (
 		<>
@@ -666,13 +991,15 @@ export default function VideoPage() {
 				src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
 				strategy="beforeInteractive"
 			/>
+			<Script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" strategy="beforeInteractive" />
+			<Script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" strategy="beforeInteractive" />
 
 			<div className=''>
 				<div ref={dataList} id='dataList' onWheel={scrollDataList}></div>
 				<div ref={containerRef} className='grid justify-center w-full h-full '>
 					<video
 						ref={videoRef}
-						style={{ display: 'none', transform: 'scaleX(-1)' }}
+						style={{ display: 'none', transform: 'scaleX(1)' }}
 						width="640"
 						height="480"
 						playsInline
@@ -681,12 +1008,13 @@ export default function VideoPage() {
 						ref={canvasRef}
 						width="640"
 						height="480"
-						style={{ transform: 'scaleX(-1)' }}
+						style={{ transform: 'scaleX(1)' }}
 					/>
 				</div>
 
 				
 				<div ref={infoList} id='infoList' onWheel={scrollInfoList}></div>
+				<button className='listenButton' ref={listenButton} onClick={toggleListen} >Listen</button>
 			</div>
 		</>
 	);

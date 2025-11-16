@@ -22,10 +22,8 @@ function useSpeechToText() {
     const resetSilenceTimer = ()=>{
         if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
         silenceTimerRef.current = setTimeout(()=>{
-            if (listening) {
-                var _recognitionRef_current;
-                (_recognitionRef_current = recognitionRef.current) === null || _recognitionRef_current === void 0 ? void 0 : _recognitionRef_current.stop();
-                setListening(false);
+            if (listening && recognitionRef.current) {
+                recognitionRef.current.stop();
             }
         }, silenceMs);
     };
@@ -60,20 +58,26 @@ function useSpeechToText() {
             })["useSpeechToText.useEffect"];
             recognition.onend = ({
                 "useSpeechToText.useEffect": ()=>{
-                    setListening(false);
-                    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+                    // Automatically restart if still listening
+                    if (listening && recognitionRef.current) {
+                        recognitionRef.current.start();
+                    } else {
+                        setListening(false);
+                        setAwake(false);
+                    }
                 }
             })["useSpeechToText.useEffect"];
             recognitionRef.current = recognition;
         }
     }["useSpeechToText.useEffect"], [
+        awake,
+        listening,
         silenceMs,
-        wakeWord,
-        listening
+        wakeWord
     ]);
     const startListen = ()=>{
-        if (!recognitionRef.current) return;
-        setAwake(false); // wake-word mode resets
+        if (!recognitionRef.current || listening) return;
+        setAwake(false);
         setText("");
         recognitionRef.current.start();
         resetSilenceTimer();
@@ -99,6 +103,367 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }
 }),
+"[project]/public/scrapedData.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+// export const scrapedData = [
+//   { name: 'Syed Mujtaba Tirmizi', 
+//     email:'mujtabat@meta.com',
+//     company:'Meta',
+//     job: 'Senior Data Science Manager',
+//     linkedIn: 'https://www.linkedin.com/in/mujtabatirmizi/',
+//     education: 'University of Waterloo',
+//     instagram: 'https://www.instagram.com/mujtabatirmizii',
+//     wikipedia: 'https://en.wikipedia.org/wiki/Syed_Mujtaba_Tirmizi?fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4CGNhbGxzaXRlAjE1AAGnNdEZp14IVufa6eFtyqWXBiQfBQfljTklSR7lToqgMesfTohbSr2pPSc8R88_aem_DKqllH8XyrPqpt_LZX364w',
+//     military_service: 'Pakistan 1982–2016'
+//   },
+//   { name: 'Meetu Malhotra ', 
+//     email:'Fmeetu@my.harrisburgu.edu',
+//     education1:'Harrisburg University of Science and Technology',
+//     company2:'S&P Global',
+//     job: 'Data Analytics Principal',
+//     linkedIn: 'http://www.linkedin.com/in/meetu30',
+//     education2: 'University of North Carolina at Charlotte',
+//     instagram1: 'https://www.instagram.com/meetu_9846',
+//     instagram2: 'https://www.instagram.com/meetu_malhotra',
+//     instagram3: 'https://www.instagram.com/meetu_malhotra_',
+//     specialization: 'Natural language processing and deep learning'
+//   },
+//   { name: 'Reshu Bisht', 
+//     email:'reshu.bisht2013@gmail.com',
+//     company:'Meta',
+//     job: 'Machine Learning Engineer',
+//     linkedIn: 'https://www.linkedin.com/in/reshu-bisht/',
+//     instagram1: 'https://www.instagram.com/reshu.bisht',
+//     instagram2: 'https://www.instagram.com/reshubisht5'
+//   },
+//   { name: 'Abhi Desai', 
+//     email:'desai.abhi94@gmail.com',
+//     company:'Saks Fifth Avenue',
+//     job: 'Senior Data Analyst',
+//     linkedIn: 'https://www.linkedin.com/in/abhi-desai-5b35a018b',
+//     instagram1: 'https://www.instagram.com/abhi.desai11',
+//     instragram2: 'https://www.instagram.com/abhi._desai'
+//   },
+//   { name: 'Sagar Bharat Shah', 
+//     email:'sagarshah8087@gmail.com',
+//     company:'JPMorgan Chase & Co',
+//     job: 'AI & Data Product Leader',
+//     linkedIn: 'https://www.linkedin.com/in/sagarbharatshah/',
+//     instagram1: 'https://www.instagram.com/sagarshahchess',
+//     instagram2: 'https://www.instagram.com/sagarshah9826',
+//     specialization: 'Financial technology and AI'
+//   },
+//   { name: 'Aashrey Kamal Sharma', 
+//     email:'aashrey9sharma@gmail.com',
+//     company:'Epic Games',
+//     job: 'Senior UX Designer',
+//     linkedIn: 'https://www.linkedin.com/in/aashreys/',
+//     education: 'University of Maryland',
+//     instagram1: 'https://www.instagram.com/aashrey_sharma',
+//     instagram2: 'https://www.instagram.com/aashreys'
+//   },
+//   { name: 'Bhakti Mahato', 
+//     email:'mabhakti@amazon.com',
+//     company:'Amazon Pharmacy',
+//     job: 'Sr. Product Manager',
+//     education: 'University of Cincinnati College of Business',
+//     linkedIn: 'https://www.linkedin.com/in/bhakti-mahato5/',
+//     specialization: 'large-scale healthcare solutions',
+//     instagram1: 'https://www.instagram.com/enigmatic_reality',
+//     instagram2: 'https://www.instagram.com/bhaktimahato54',
+//   },
+//   { name: 'Abishek Sethuraman', 
+//     email:'abisheksethuraman@gmail.com',
+//     company1:'Meta',
+//     company2:'Facebook',
+//     job: 'Senior Software Engineer',
+//     linkedIn: 'http://www.linkedin.com/in/abishek-sethuraman',
+//     instagram: 'https://www.instagram.com/abisheksethuraman',
+//     education1: 'University of Florida',
+//     education2: 'Mumbai University Mumbai'
+//   },
+//   { name: 'Jyoti Kunal Shah', 
+//     email:'thejyotishah83@gmail.com',
+//     company:'ADP',
+//     job: 'Director of Application Development',
+//     linkedIn: 'https://www.linkedin.com/in/jyoti-shah-6a550817/',
+//     instagram1: 'https://www.instagram.com/jyotishah___',
+//     instagram2: 'https://www.instagram.com/jyotishah_3',
+//     specialization: 'Java, Angular, Spring programming'
+//   },
+//   { name: 'Jayesh Gupta', 
+//     email:'jgupta0700@gmail.com',
+//     company:'Intersystems',
+//     job: 'Software Engineer',
+//     linkedIn: 'https://www.linkedin.com/in/jayeshgupta0700/',
+//     education: 'Duke University',
+//     instagram1: 'https://www.instagram.com/jayeshgupta724',
+//     instagram2: 'https://www.instagram.com/jayesh.gupta',
+//     instagram3: 'https://www.instagram.com/ja_yesh2190',
+//   },
+//   { name: 'Pathik Sharma', 
+//     email:'',
+//     company:'Google',
+//     job: 'Cloud Solutions Architect',
+//     linkedIn: 'http://linkedin.com/in/pathik-sharma',
+//     instagram1: 'https://www.instagram.com/_pathik_sharma_',
+//     instagram2: 'https://www.instagram.com/pathik_sharma',
+//     instagram3: 'https://www.instagram.com/pathik.sharma.5688',
+//     education: 'State University of New York at Stony Brook',
+//     specialization: 'Cloud financial operational cost optimiation'
+//   },
+//   { name: 'Minerva Gupta', 
+//     email:'',
+//     company:'Meta',
+//     job: 'Machine Learning Engineer',
+//     linkedIn: 'https://www.linkedin.com/in/minervagupta/',
+//     education: 'University of Rochester',
+//     instagram1: 'https://www.instagram.com/minerva_gupta',
+//     instagram2: 'https://www.instagram.com/minerva.gupta',
+//     instagram3: 'https://www.instagram.com/minerva.gupta.79',
+//   },
+//   { name: 'Minfeng Liu', 
+//     email:'contact.minfeng@gmail.com',
+//     company:'Nanfang Hospital',
+//     job: 'Doctor',
+//     linkedIn: 'https://www.linkedin.com/in/minfeng-liu-84050837',
+//     instagram1: 'https://www.instagram.com/minfengliu',
+//   },
+//   { name: 'Dev Patel', 
+//     email:'devp_10@yahoo.com',
+//     company:'PPL Corporation',
+//     job: 'Data Engineer',
+//     linkedIn: 'https://www.linkedin.com/in/devp10',
+//     instagram1: 'https://www.instagram.com/devpat3l',
+//     instagram2: 'https://www.instagram.com/devpatelactor',
+//     instagram3: 'https://www.instagram.com/devpatelisprecious',
+//     education: 'Penn State University'
+//   },
+//   { name: 'Ofer Vugman', 
+//     email:'vugman.ofer@gmail.com',
+//     company:'Lemonade',
+//     job: 'Staff Engineer',
+//     linkedIn: 'https://www.linkedin.com/in/ofervugman/',
+//     instagram1: '',
+//     instagram2: '',
+//     instagram3: '',
+//   },
+//   { name: 'Vikesh Dudankar', 
+//     email:'vikesh.dudhankar@gmail.com',
+//     company:'Morgan Stanley',
+//     job: 'Vice President',
+//     linkedIn: 'https://www.linkedin.com/in/vikesh-dudhankar',
+//     instagram: 'https://www.instagram.com/ofer_vugman',
+//   },
+//   { name: 'Sohom Chatterjee', 
+//     email:'Sohom070994@gmail.com',
+//     company:'GE Aerospace Research',
+//     job: 'Research Engineer',
+//     linkedIn: 'https://www.linkedin.com/in/sohom070994',
+//     instagram1: 'https://www.instagram.com/s_for_sohom',
+//     instagram2: 'https://www.instagram.com/sohom.chatterjee.334',
+//     education: 'Texas A&M University',
+//   },
+//   { name: 'Nihar Karra', 
+//     email:'niharreddy.k@gmail.com',
+//     company:'Amazon Web Services',
+//     job: 'Cloud Engineer II',
+//     linkedIn: 'https://www.linkedin.com/in/niharkarra/',
+//     instagram: 'https://www.instagram.com/nihar_kapoor',
+//     education: 'University of the Cumberlands',
+//   },
+//   { name: 'Haoran Chen', 
+//     email:'fredchen0331@gmail.com',
+//     company:'Connectus Technology Inc',
+//     job: 'Bank of America',
+//     linkedIn: 'https://www.linkedin.com/in/haoranc1/',
+//     instagram1: 'https://www.instagram.com/haoran.chen.7568',
+//     instagram2: 'https://www.instagram.com/its_haoran',
+//     education1: 'NYU Tandon School of Engineering',
+//     education2: 'UC Irvine'
+//   },
+//   { name: 'Jasdeep Singh Bhalla', 
+//     email:'jasdeepbhalla@gmail.com',
+//     company:'GoDaddy',
+//     job: 'Senior Software Engineer',
+//     linkedIn: 'https://www.linkedin.com/in/jsblive/',
+//     instagram1: 'https://www.instagram.com/isssa5911',
+//     instagram2: 'https://www.instagram.com/jasdeepbhalla',
+//     education: 'Arizona State University'
+//   },
+//   { name: 'Tejas Pravinbhai Patel', 
+//     email:'tejas5038@gmail.com',
+//     company:'Amazon',
+//     job: 'Software Development Engineer II',
+//     linkedIn: 'https://www.linkedin.com/in/tejas5038/',
+//     instagram1: 'https://www.instagram.com/tejas_304',
+//     instagram2: 'https://www.instagram.com/iam.tejaspatel',
+//     instagram3: 'https://www.instagram.com/tejaspateldds',
+//     education: 'The University of Texas at Arlington'
+//   },
+//   { name: 'Shubham Kulkarni', 
+//     email:'shubhamkulkarni.work@gmail.com',
+//     company:'QVC Group',
+//     linkedIn: 'https://www.linkedin.com/in/shubhamkulkarni29/',
+//     job: 'Product Designer',
+//     instagram1: 'https://www.instagram.com/shubham_kulkarni_______',
+//     instagram2: 'https://www.instagram.com/shubham_.kulkarni',
+//     instagram3: 'https://www.instagram.com/shubhamkulkarni24',
+//     education: 'Thomas Jefferson University',
+//     phone: '267-910-9022',
+//     location: 'Philadelphia, PA'
+//   },
+//   { name: 'Ishan Shah', 
+//     email:'ishanshah301190@gmail.com',
+//     company:'PayPal',
+//     job: 'Staff Software Engineer',
+//     linkedIn: 'http://www.linkedin.com/in/ishandshah',
+//     education: 'Cal State LA College of ECST',
+//     instagram1: 'https://www.instagram.com/__ishan.shah',
+//     instagram2: 'https://www.instagram.com/ishan.shah17',
+//     instagram3: 'https://www.instagram.com/ishan.shah__',
+//     location: 'San Francisco Bay Area',
+//     github: 'https://github.com/Ishandshah'
+//   },
+//   { name: 'Ajay Kaarthic Jeysree', 
+//     email:'ajaykaarthic@gmail.com',
+//     company:'Blue Yonder',
+//     job: 'Software Engineer',
+//     linkedIn: 'https://www.linkedin.com/in/ajaykaarthic/',
+//     instagram1: 'https://www.instagram.com/ajaykaarthic',
+//     instagram2: 'https://www.instagram.com/ajay_kaarthick',
+//     instagram3: 'https://www.instagram.com/ajay.karthic.9',
+//     education: 'The University of Texas at Dallas'
+//   },
+//   { name: 'Prakul Sairaha', 
+//     email:'psairaha@microsoft.com',
+//     company:'Microsoft',
+//     job: 'Senior Cloud Solution Architect',
+//     linkedIn: 'https://www.linkedin.com/in/prakulsairaha/',
+//     education: 'Jaypee Institute Of Information Technology University',
+//     instagram: 'https://www.instagram.com/prakulsairaha',
+//   },
+//   { name: 'Sean Alcordo', 
+//     email:'sjalcordo@gmail.com',
+//     company:'Velan Studios',
+//     job: 'Gameplay Programmer',
+//     linkedIn: 'https://www.linkedin.com/in/sean-jacob-alcordo/',
+//     instagram1: 'https://www.instagram.com/unfortunately.seen',
+//     instagram2: 'https://www.instagram.com/seanjacobspam',
+//     education: 'Rensselaer Polytechnic Institute'
+//   },
+//   { name: 'Daniel Raj Jeevaguntala', 
+//     email:'daniel212@gmail.com',
+//     company:'IEEE Schenectady',
+//     job: 'Software Engineer',
+//     linkedIn: 'https://www.linkedin.com/in/daniel-raj-jeevigunta-9b214080',
+//     education: 'SS&N college Narasaraopet'
+//   },
+//   { name: 'John Krupavaram Pole Bhakthavatsalam', 
+//     email:'johnpole555@gmail.com',
+//     company:'IEEE Schenectady',
+//     job: 'Lead fullstack software developer',
+//     linkedIn: 'https://www.linkedin.com/in/john-krupavaram-pole-bhakthavatsalam-5a065912a',
+//     education: 'NYS Office of Information Technology Services, IES'
+//   }
+// ];
+__turbopack_context__.s([
+    "scrapedData",
+    ()=>scrapedData
+]);
+const scrapedData = [
+    {
+        name: 'Xenia',
+        job: 'Google',
+        location: 'DCC',
+        rizz: 'has'
+    },
+    {
+        name: 'Matthew',
+        job: 'not crashing out',
+        location: 'Idk',
+        education: 'top tier',
+        rizz: 'yup'
+    },
+    {
+        name: 'CJ',
+        job: 'survive',
+        location: '??',
+        hobby: 'hackathons',
+        rizz: 'yes'
+    },
+    {
+        name: 'Dakshesh',
+        hobbies: 'legos an shi',
+        lastVacationTrip: 'beach',
+        rizz: 'rizzy'
+    },
+    {
+        name: 'Shankar',
+        favoriteFood: 'McDonalds',
+        favoriteDance: 'breakdance',
+        rizz: 'yur'
+    },
+    {
+        name: 'Devan',
+        job: 'McDonalds',
+        location: 'McDonalds',
+        rizzLevel: 'decent'
+    },
+    {
+        name: 'Aaryan',
+        job: 'being a cracked networker',
+        money: 'up',
+        rizz: 'unfathomable'
+    },
+    {
+        name: 'Ethan',
+        job: 'McDonalds',
+        location: 'idk bruh this just example data',
+        rizz: 'perchance'
+    },
+    {
+        name: 'Tobias',
+        job: 'McDonalds',
+        location: 'idk bruh this just example data',
+        rizz: '7 rizzes'
+    },
+    {
+        name: 'Lala',
+        job: 'McDonalds',
+        location: 'idk bruh this just example data',
+        rizz: 'Ok'
+    },
+    {
+        name: 'Jackson',
+        job: 'McDonalds',
+        location: 'idk bruh this just example data',
+        rizz: 'extra'
+    },
+    {
+        name: 'Caleb',
+        job: 'McDonalds',
+        location: 'idk bruh this just example data',
+        rizz: 'super'
+    },
+    {
+        name: 'Suyash',
+        job: 'McDonalds',
+        location: 'idk bruh this just example data',
+        rizz: 'rizz'
+    },
+    {
+        name: 'Jodie',
+        job: 'McDonalds',
+        location: 'idk bruh this just example data',
+        rizz: 'blizz'
+    }
+];
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
 "[project]/app/video/page.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
@@ -110,6 +475,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$video$2f$speech$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/video/speech.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$script$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/script.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$public$2f$scrapedData$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/public/scrapedData.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$examples$2f$jsm$2f$loaders$2f$GLTFLoader$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/three/examples/jsm/loaders/GLTFLoader.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$examples$2f$jsm$2f$loaders$2f$FontLoader$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/three/examples/jsm/loaders/FontLoader.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$examples$2f$jsm$2f$geometries$2f$TextGeometry$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/three/examples/jsm/geometries/TextGeometry.js [app-client] (ecmascript)");
@@ -118,6 +484,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$bui
 ;
 var _s = __turbopack_context__.k.signature();
 'use client';
+;
 ;
 ;
 ;
@@ -142,6 +509,7 @@ function VideoPage() {
         'conversation',
         'nameTag'
     ];
+    const listenButton = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
     const { text, listening, awake, startListen, stopListen } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$video$2f$speech$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSpeechToText"])({
         silenceMs: 2500,
         wakeWord: "hey app"
@@ -201,85 +569,323 @@ function VideoPage() {
             three.camera.updateProjectionMatrix();
         }
     }
-    function setUpCamera() {
-        landmarkData.hands = new window.Hands({
+    /*
+	function setUpCamera(){
+
+		landmarkData.hands = new window.Hands({
+			locateFile: (file: string) =>
+				`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+		});
+
+		landmarkData.hands.setOptions({
+			maxNumHands: 2,
+			modelComplexity: 1,
+			minDetectionConfidence: 0.7,
+			minTrackingConfidence: 0.5,
+		});
+		
+		const canvas = canvasRef.current!;
+		const ctx = canvas.getContext('2d')!;
+		let cubeObject = profileList[0].threeShape;
+
+		landmarkData.hands.onResults((results: any) => {
+			ctx.save();
+			// ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+
+			if (results.multiHandLandmarks) {
+
+				let chosenHand = 'Left';
+				let data = null;
+				//asd
+				for(let i = 0; i < results.multiHandedness.length; i++)
+					if(results.multiHandedness[i].label == chosenHand) data = results.multiHandLandmarks[results.multiHandedness[i].index];
+
+				if(data != null){
+					if(profileList.length > 0 && three.camera){
+						
+						let landmark = results.multiHandLandmarks[0][8]; // index fingertip
+						let projectionData = projectLandmark(landmark);
+						let landmark2 = results.multiHandLandmarks[0][4];
+
+
+						let flatLandmarkData = {
+							x1: landmark.x*canvas.width, 
+							y1: landmark.y*canvas.height,
+							x2: landmark2.x*canvas.width, 
+							y2: landmark2.y*canvas.height
+						}
+
+
+						ctx.lineWidth = 10;
+						ctx.beginPath();
+						ctx.moveTo(flatLandmarkData.x1, flatLandmarkData.y1);
+						ctx.lineTo(flatLandmarkData.x2, flatLandmarkData.y2);
+						ctx.stroke();
+
+						let dist = Math.sqrt((flatLandmarkData.x1-flatLandmarkData.x2)*(flatLandmarkData.x1-flatLandmarkData.x2) + (flatLandmarkData.y1-flatLandmarkData.y2)*(flatLandmarkData.y1-flatLandmarkData.y2));
+						landmarkData.smoothing.pinchDist.push(dist);
+						let avgDist = listAverage(landmarkData.smoothing.pinchDist);
+
+
+						cubeObject.rotation.x = avgDist / 100;
+						cubeObject.rotation.y = avgDist / 100;
+						cubeObject.rotation.z = avgDist / 100;
+
+						//x is 1 to -1 ish
+						//y is 1 to -1
+						
+						let pinchedDist = (100+ ((0.9-projectionData.ndcZ)*720)) + 20;
+						if(dist < pinchedDist){
+							let newMove = smoothMove(profileList[0].threeShape, projectionData.ndcX, projectionData.ndcY, projectionData.ndcZ);
+							let ndc = new THREE.Vector3(newMove.avgX, newMove.avgY, newMove.avgZ);
+							ndc.unproject(three.camera);
+							cubeObject.position.copy(ndc);
+						}
+
+					}
+				}
+
+				for (const landmarks of results.multiHandLandmarks) {
+					window.drawConnectors(ctx, landmarks, window.HAND_CONNECTIONS, {
+						color: '#00FF00',
+						lineWidth: 2,
+					});
+					window.drawLandmarks(ctx, landmarks, {
+						color: '#FF0000',
+						lineWidth: 1,
+					});
+				}
+			}
+			ctx.restore();
+		});
+
+		handsRef.current = landmarkData.hands;
+
+		landmarkData.camera = new window.Camera(videoRef.current!, {
+			onFrame: async () => {
+				await landmarkData.hands.send({ image: videoRef.current! });
+			},
+			width: 640,
+			height: 480,
+		});
+
+		cameraRef.current = landmarkData.camera;
+		landmarkData.camera.start();
+
+
+
+
+
+
+
+
+
+
+		// if (!window.FaceMesh || !window.Camera) return;
+
+		// let video = videoRef.current!;
+
+		// let faceMesh = new window.FaceMesh({
+		// 	locateFile: (file: string) =>
+		// 		`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
+		// });
+
+		// faceMesh.setOptions({
+		// 	maxNumFaces: 1,
+		// 	refineLandmarks: true,
+		// 	minDetectionConfidence: 0.5,
+		// 	minTrackingConfidence: 0.5,
+		// });
+
+		// faceMesh.onResults((results: any) => {
+		// 	// ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		// // Draw mirrored video
+		// ctx.save();
+		// ctx.scale(-1, 1);
+		// ctx.drawImage(results.image, -canvas.width, 0, canvas.width, canvas.height);
+		// ctx.restore();
+
+		// // Draw glowing dots
+		// if (!results.multiFaceLandmarks?.length) return;
+
+		// let landmarks = results.multiFaceLandmarks[0];
+
+		// landmarks.forEach((lm: any) => {
+		// 	const x = canvas.width - lm.x * canvas.width;
+		// 	const y = lm.y * canvas.height;
+
+		// 	const gradient = ctx.createRadialGradient(x, y, 0, x, y, 10);
+		// 	gradient.addColorStop(0, "rgba(0,255,255,1)");
+		// 	gradient.addColorStop(1, "rgba(0,255,255,0)");
+
+		// 	ctx.fillStyle = gradient;
+		// 	ctx.beginPath();
+		// 	ctx.arc(x, y, 5, 0, Math.PI * 2);
+		// 	ctx.fill();
+		// });
+		// });
+
+		// const camera = new window.Camera(video, {
+		// onFrame: async () => {
+		// 		await faceMesh.send({ image: video });
+		// 	},
+		// 	width: 640,
+		// 	height: 480,
+		// });
+
+		// camera.start();
+		
+
+	}
+*/ function setUpCamera() {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        const video = videoRef.current;
+        let cubeObject = profileList[0].threeShape;
+        // storage for latest results
+        let latestHands = null;
+        let latestFace = null;
+        // ============================================================
+        // 1. HANDS MODEL
+        // ============================================================
+        const hands = new window.Hands({
             locateFile: (file)=>"https://cdn.jsdelivr.net/npm/@mediapipe/hands/".concat(file)
         });
-        landmarkData.hands.setOptions({
+        hands.setOptions({
             maxNumHands: 2,
             modelComplexity: 1,
             minDetectionConfidence: 0.7,
             minTrackingConfidence: 0.5
         });
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        let cubeObject = profileList[0].threeShape;
-        landmarkData.hands.onResults((results)=>{
-            ctx.save();
-            ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
-            if (results.multiHandLandmarks) {
-                let chosenHand = 'Left';
-                let data = null;
-                //asd
-                for(let i = 0; i < results.multiHandedness.length; i++)if (results.multiHandedness[i].label == chosenHand) data = results.multiHandLandmarks[results.multiHandedness[i].index];
-                if (data != null) {
-                    if (profileList.length > 0 && three.camera) {
-                        let landmark = results.multiHandLandmarks[0][8]; // index fingertip
-                        let projectionData = projectLandmark(landmark);
-                        let landmark2 = results.multiHandLandmarks[0][4];
-                        let flatLandmarkData = {
-                            x1: landmark.x * canvas.width,
-                            y1: landmark.y * canvas.height,
-                            x2: landmark2.x * canvas.width,
-                            y2: landmark2.y * canvas.height
-                        };
-                        ctx.lineWidth = 10;
-                        ctx.beginPath();
-                        ctx.moveTo(flatLandmarkData.x1, flatLandmarkData.y1);
-                        ctx.lineTo(flatLandmarkData.x2, flatLandmarkData.y2);
-                        ctx.stroke();
-                        let dist = Math.sqrt((flatLandmarkData.x1 - flatLandmarkData.x2) * (flatLandmarkData.x1 - flatLandmarkData.x2) + (flatLandmarkData.y1 - flatLandmarkData.y2) * (flatLandmarkData.y1 - flatLandmarkData.y2));
-                        landmarkData.smoothing.pinchDist.push(dist);
-                        let avgDist = listAverage(landmarkData.smoothing.pinchDist);
-                        cubeObject.rotation.x = avgDist / 100;
-                        cubeObject.rotation.y = avgDist / 100;
-                        cubeObject.rotation.z = avgDist / 100;
-                        //x is 1 to -1 ish
-                        //y is 1 to -1
-                        let pinchedDist = 100 + (0.9 - projectionData.ndcZ) * 720 + 20;
-                        if (dist < pinchedDist) {
-                            let newMove = smoothMove(profileList[0].threeShape, projectionData.ndcX, projectionData.ndcY, projectionData.ndcZ);
-                            let ndc = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Vector3"](newMove.avgX, newMove.avgY, newMove.avgZ);
-                            ndc.unproject(three.camera);
-                            cubeObject.position.copy(ndc);
-                        }
-                    }
-                }
-                for (const landmarks of results.multiHandLandmarks){
-                    window.drawConnectors(ctx, landmarks, window.HAND_CONNECTIONS, {
-                        color: '#00FF00',
-                        lineWidth: 2
-                    });
-                    window.drawLandmarks(ctx, landmarks, {
-                        color: '#FF0000',
-                        lineWidth: 1
-                    });
-                }
-            }
-            ctx.restore();
+        hands.onResults((results)=>{
+            latestHands = results; // ← store only
         });
-        handsRef.current = landmarkData.hands;
-        landmarkData.camera = new window.Camera(videoRef.current, {
+        // ============================================================
+        // 2. FACE MESH MODEL
+        // ============================================================
+        const faceMesh = new window.FaceMesh({
+            locateFile: (file)=>"https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/".concat(file)
+        });
+        faceMesh.setOptions({
+            maxNumFaces: 1,
+            refineLandmarks: true,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+        faceMesh.onResults((results)=>{
+            latestFace = results; // ← store only
+        });
+        // ============================================================
+        // 3. ONE CAMERA THAT FEEDS BOTH
+        // ============================================================
+        const camera = new window.Camera(video, {
             onFrame: async ()=>{
-                await landmarkData.hands.send({
-                    image: videoRef.current
+                await hands.send({
+                    image: video
                 });
+                await faceMesh.send({
+                    image: video
+                });
+                drawFrame(); // ← draw everything here
             },
             width: 640,
             height: 480
         });
-        cameraRef.current = landmarkData.camera;
-        landmarkData.camera.start();
+        camera.start();
+        // ============================================================
+        // 4. THE RENDER PIPELINE (the FIX)
+        // ============================================================
+        function drawFrame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            //
+            // 1. MIRROR CONTEXT FOR EVERYTHING
+            //
+            ctx.save();
+            ctx.scale(-1, 1);
+            ctx.translate(-canvas.width, 0);
+            //
+            // 2. DRAW VIDEO (mirrored!)
+            //
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            //
+            // 3. DRAW HAND LANDMARKS (mirrored!)
+            //
+            if (latestHands === null || latestHands === void 0 ? void 0 : latestHands.multiHandLandmarks) {
+                const results = latestHands;
+                // Your pinch + cube logic still works because it's in canvas space
+                let chosenHand = "Left";
+                let data = null;
+                for(let i = 0; i < results.multiHandedness.length; i++){
+                    if (results.multiHandedness[i].label === chosenHand) {
+                        data = results.multiHandLandmarks[results.multiHandedness[i].index];
+                    }
+                }
+                if (data != null && profileList.length > 0 && three.camera) {
+                    let lm = results.multiHandLandmarks[0][8];
+                    let lm2 = results.multiHandLandmarks[0][4];
+                    // SAME coordinates (canvas now mirrored)
+                    const flat = {
+                        x1: lm.x * canvas.width,
+                        y1: lm.y * canvas.height,
+                        x2: lm2.x * canvas.width,
+                        y2: lm2.y * canvas.height
+                    };
+                    ctx.lineWidth = 10;
+                    ctx.beginPath();
+                    ctx.moveTo(flat.x1, flat.y1);
+                    ctx.lineTo(flat.x2, flat.y2);
+                    ctx.stroke();
+                    let dist = Math.hypot(flat.x1 - flat.x2, flat.y1 - flat.y2);
+                    landmarkData.smoothing.pinchDist.push(dist);
+                    const avgDist = listAverage(landmarkData.smoothing.pinchDist);
+                    cubeObject.rotation.x = avgDist / 100;
+                    cubeObject.rotation.y = avgDist / 100;
+                    cubeObject.rotation.z = avgDist / 100;
+                    const projectionData = projectLandmark(lm);
+                    let pinchedDist = 100 + (0.9 - projectionData.ndcZ) * 720 + 20;
+                    if (dist < pinchedDist) {
+                        let newMove = smoothMove(profileList[0].threeShape, projectionData.ndcX, projectionData.ndcY, projectionData.ndcZ);
+                        let ndc = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Vector3"](newMove.avgX, newMove.avgY, newMove.avgZ);
+                        ndc.unproject(three.camera);
+                        cubeObject.position.copy(ndc);
+                    }
+                }
+                // draw all hands
+                for (const lm of results.multiHandLandmarks){
+                    window.drawConnectors(ctx, lm, window.HAND_CONNECTIONS, {
+                        color: "#00FF00",
+                        lineWidth: 2
+                    });
+                    window.drawLandmarks(ctx, lm, {
+                        color: "#FF0000",
+                        lineWidth: 1
+                    });
+                }
+            }
+            //
+            // 4. DRAW FACE LANDMARKS (mirrored!)
+            //
+            if (latestFace === null || latestFace === void 0 ? void 0 : latestFace.multiFaceLandmarks) {
+                const landmarks = latestFace.multiFaceLandmarks[0];
+                if (landmarks) landmarks.forEach((lm)=>{
+                    const x = lm.x * canvas.width; // <— NO canvas.width - x
+                    const y = lm.y * canvas.height;
+                    const g = ctx.createRadialGradient(x, y, 0, x, y, 10);
+                    g.addColorStop(0, "rgba(0,255,255,1)");
+                    g.addColorStop(1, "rgba(0,255,255,0)");
+                    ctx.fillStyle = g;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+            //
+            // 5. RESTORE (leave canvas normal for next frame)
+            //
+            ctx.restore();
+        }
     }
     function createScene() {
         three.scene = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Scene"]();
@@ -638,52 +1244,11 @@ function VideoPage() {
             loadData(tempData);
         });
     }
-    function drawFace() {
-        if (!window.FaceMesh || !window.Camera) return;
-        let video = videoRef.current;
-        let canvas = canvasRef.current;
-        let ctx = canvas.getContext("2d");
-        let faceMesh = new window.FaceMesh({
-            locateFile: (file)=>"https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/".concat(file)
-        });
-        faceMesh.setOptions({
-            maxNumFaces: 1,
-            refineLandmarks: true,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
-        });
-        faceMesh.onResults((results)=>{
-            var _results_multiFaceLandmarks;
-            // Draw mirrored video
-            ctx.save();
-            ctx.scale(-1, 1);
-            ctx.drawImage(results.image, -canvas.width, 0, canvas.width, canvas.height);
-            ctx.restore();
-            // Draw glowing dots
-            if (!((_results_multiFaceLandmarks = results.multiFaceLandmarks) === null || _results_multiFaceLandmarks === void 0 ? void 0 : _results_multiFaceLandmarks.length)) return;
-            let landmarks = results.multiFaceLandmarks[0];
-            landmarks.forEach((lm)=>{
-                const x = canvas.width - lm.x * canvas.width;
-                const y = lm.y * canvas.height;
-                const gradient = ctx.createRadialGradient(x, y, 0, x, y, 10);
-                gradient.addColorStop(0, "rgba(0,255,255,1)");
-                gradient.addColorStop(1, "rgba(0,255,255,0)");
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.arc(x, y, 5, 0, Math.PI * 2);
-                ctx.fill();
-            });
-        });
-        const camera = new window.Camera(video, {
-            onFrame: async ()=>{
-                await faceMesh.send({
-                    image: video
-                });
-            },
-            width: 640,
-            height: 480
-        });
-        camera.start();
+    function toggleListen() {
+        if (listening) stopListen();
+        else startListen();
+        console.log(listening);
+        console.log(text);
     }
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "VideoPage.useEffect": ()=>{
@@ -692,10 +1257,9 @@ function VideoPage() {
             resize();
             if ("object" === 'undefined' || !window.Hands || !window.Camera) return;
             createScene();
-            drawFace();
             // createCube(1);
-            // loadErryThang(scrapedData);
-            // animate();
+            loadErryThang(__TURBOPACK__imported__module__$5b$project$5d2f$public$2f$scrapedData$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["scrapedData"]);
+            animate();
             let conversation = "Hello, How are you doing? I'm doing well, I just got back from my trip to SodaCity Beach. My work phone number is 123456789 and my middle name is BobbyMcBob. My favorite food is donuts and I work at Pipes Inc. I am actually the Senior manager of cooling.";
             createProfile({
                 name: 'Mac',
@@ -714,14 +1278,8 @@ function VideoPage() {
             })["VideoPage.useEffect"];
         }
     }["VideoPage.useEffect"], []);
-    // check Listening
-    // sample scraping
-    // Fix box animations
+    // voice
     // add lines between connections
-    // tween sample info
-    // hand controls
-    // face detection
-    // Nicer UI
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$script$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -729,7 +1287,7 @@ function VideoPage() {
                 strategy: "beforeInteractive"
             }, void 0, false, {
                 fileName: "[project]/app/video/page.tsx",
-                lineNumber: 756,
+                lineNumber: 982,
                 columnNumber: 4
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$script$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -737,7 +1295,7 @@ function VideoPage() {
                 strategy: "beforeInteractive"
             }, void 0, false, {
                 fileName: "[project]/app/video/page.tsx",
-                lineNumber: 760,
+                lineNumber: 986,
                 columnNumber: 4
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$script$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -745,7 +1303,7 @@ function VideoPage() {
                 strategy: "beforeInteractive"
             }, void 0, false, {
                 fileName: "[project]/app/video/page.tsx",
-                lineNumber: 764,
+                lineNumber: 990,
                 columnNumber: 4
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$script$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -753,7 +1311,7 @@ function VideoPage() {
                 strategy: "beforeInteractive"
             }, void 0, false, {
                 fileName: "[project]/app/video/page.tsx",
-                lineNumber: 768,
+                lineNumber: 994,
                 columnNumber: 4
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$script$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -761,7 +1319,7 @@ function VideoPage() {
                 strategy: "beforeInteractive"
             }, void 0, false, {
                 fileName: "[project]/app/video/page.tsx",
-                lineNumber: 769,
+                lineNumber: 995,
                 columnNumber: 4
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -773,7 +1331,7 @@ function VideoPage() {
                         onWheel: scrollDataList
                     }, void 0, false, {
                         fileName: "[project]/app/video/page.tsx",
-                        lineNumber: 772,
+                        lineNumber: 998,
                         columnNumber: 5
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -784,14 +1342,14 @@ function VideoPage() {
                                 ref: videoRef,
                                 style: {
                                     display: 'none',
-                                    transform: 'scaleX(-1)'
+                                    transform: 'scaleX(1)'
                                 },
                                 width: "640",
                                 height: "480",
                                 playsInline: true
                             }, void 0, false, {
                                 fileName: "[project]/app/video/page.tsx",
-                                lineNumber: 774,
+                                lineNumber: 1000,
                                 columnNumber: 6
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("canvas", {
@@ -799,17 +1357,17 @@ function VideoPage() {
                                 width: "640",
                                 height: "480",
                                 style: {
-                                    transform: 'scaleX(-1)'
+                                    transform: 'scaleX(1)'
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/app/video/page.tsx",
-                                lineNumber: 781,
+                                lineNumber: 1007,
                                 columnNumber: 6
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/video/page.tsx",
-                        lineNumber: 773,
+                        lineNumber: 999,
                         columnNumber: 5
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -818,19 +1376,29 @@ function VideoPage() {
                         onWheel: scrollInfoList
                     }, void 0, false, {
                         fileName: "[project]/app/video/page.tsx",
-                        lineNumber: 790,
+                        lineNumber: 1016,
+                        columnNumber: 5
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        className: "listenButton",
+                        ref: listenButton,
+                        onClick: toggleListen,
+                        children: "Listen"
+                    }, void 0, false, {
+                        fileName: "[project]/app/video/page.tsx",
+                        lineNumber: 1017,
                         columnNumber: 5
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/video/page.tsx",
-                lineNumber: 771,
+                lineNumber: 997,
                 columnNumber: 4
             }, this)
         ]
     }, void 0, true);
 }
-_s(VideoPage, "btI/FUGMgrdOkueGW8R4i97RQAU=", false, function() {
+_s(VideoPage, "sE81EcGqWr4paOgfDg3kViBqtjs=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$video$2f$speech$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSpeechToText"]
     ];
@@ -844,4 +1412,4 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 }),
 ]);
 
-//# sourceMappingURL=app_video_3475778e._.js.map
+//# sourceMappingURL=_0ae61c3b._.js.map

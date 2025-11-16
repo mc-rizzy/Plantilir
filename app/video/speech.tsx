@@ -18,9 +18,8 @@ export function useSpeechToText({
     if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
 
     silenceTimerRef.current = setTimeout(() => {
-      if (listening) {
-        recognitionRef.current?.stop();
-        setListening(false);
+      if (listening && recognitionRef.current) {
+        recognitionRef.current.stop();
       }
     }, silenceMs);
   };
@@ -61,17 +60,22 @@ export function useSpeechToText({
     };
 
     recognition.onend = () => {
-      setListening(false);
-      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+      // Automatically restart if still listening
+      if (listening && recognitionRef.current) {
+        recognitionRef.current.start();
+      } else {
+        setListening(false);
+        setAwake(false);
+      }
     };
 
     recognitionRef.current = recognition;
-  }, [silenceMs, wakeWord, listening]);
+  }, [awake, listening, silenceMs, wakeWord]);
 
   const startListen = () => {
-    if (!recognitionRef.current) return;
+    if (!recognitionRef.current || listening) return;
 
-    setAwake(false); // wake-word mode resets
+    setAwake(false);
     setText("");
     recognitionRef.current.start();
     resetSilenceTimer();

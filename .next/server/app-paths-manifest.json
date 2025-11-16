@@ -1,5 +1,8 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/api/gemini/route": "app/api/gemini/route.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/landing/page": "app/landing/page.js",
+  "/sign/page": "app/sign/page.js",
   "/video/page": "app/video/page.js"
 }
