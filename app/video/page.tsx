@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useSpeechToText } from "./speech";
 import Script from 'next/script';
-import { scrapedData } from '../../public/scrapedData';
+// import { scrapedData } from '../../public/scrapedData';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { FontLoader, Font } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
@@ -22,6 +22,8 @@ export default function VideoPage() {
 	const nodeVelocities: Record<string, THREE.Vector3> = {};
 	const ignoreParameters = ['id', 'threeShape', 'connections', 'conversation', 'nameTag'] as any;
 	const listenButton = useRef<HTMLButtonElement>(null);
+
+	const scrapedData = [{name: 'Xenia',job: 'Google',location: 'DCC',rizz: 'has'},{name: 'Matthew',job: 'not crashing out',location: 'Idk',education: 'top tier',rizz: 'yup'},{name: 'CJ',job: 'survive',location: '??',hobby: 'hackathons',rizz: 'yes'},{name: 'Dakshesh',hobbies: 'legos an shi',lastVacationTrip: 'beach',rizz: 'rizzy'},{name: 'Shankar',favoriteFood: 'McDonalds',favoriteDance: 'breakdance',rizz: 'yur'},{name: 'Devan',job: 'McDonalds',location: 'McDonalds',rizzLevel: 'decent'},{name: 'Aaryan',job: 'being a cracked networker',money: 'up',rizz: 'unfathomable'},{name: 'Ethan',job: 'McDonalds',location: 'idk bruh this just example data',rizz: 'perchance'},{name: 'Tobias',job: 'McDonalds',location: 'idk bruh this just example data',rizz: '7 rizzes'},{name: 'Lala',job: 'McDonalds',location: 'idk bruh this just example data',rizz: 'Ok'},{name: 'Jackson',job: 'McDonalds',location: 'idk bruh this just example data',rizz: 'extra'},{name: 'Caleb',job: 'McDonalds',location: 'idk bruh this just example data',rizz: 'super'},{name: 'Suyash',job: 'McDonalds',location: 'idk bruh this just example data',rizz: 'rizz'},{name: 'Jodie',job: 'McDonalds',location: 'idk bruh this just example data',rizz: 'blizz'},]
 
 	const { text, listening, awake, startListen, stopListen } = useSpeechToText({
 		silenceMs: 2500,   // auto-stop after 2.5s silence

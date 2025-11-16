@@ -25,9 +25,8 @@ function useSpeechToText({ silenceMs = 2000, wakeWord = "hey app" } = {}) {
     const resetSilenceTimer = ()=>{
         if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
         silenceTimerRef.current = setTimeout(()=>{
-            if (listening) {
-                recognitionRef.current?.stop();
-                setListening(false);
+            if (listening && recognitionRef.current) {
+                recognitionRef.current.stop();
             }
         }, silenceMs);
     };
@@ -58,18 +57,24 @@ function useSpeechToText({ silenceMs = 2000, wakeWord = "hey app" } = {}) {
             resetSilenceTimer();
         };
         recognition.onend = ()=>{
-            setListening(false);
-            if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+            // Automatically restart if still listening
+            if (listening && recognitionRef.current) {
+                recognitionRef.current.start();
+            } else {
+                setListening(false);
+                setAwake(false);
+            }
         };
         recognitionRef.current = recognition;
     }, [
+        awake,
+        listening,
         silenceMs,
-        wakeWord,
-        listening
+        wakeWord
     ]);
     const startListen = ()=>{
-        if (!recognitionRef.current) return;
-        setAwake(false); // wake-word mode resets
+        if (!recognitionRef.current || listening) return;
+        setAwake(false);
         setText("");
         recognitionRef.current.start();
         resetSilenceTimer();
@@ -101,6 +106,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$video$2f$speech$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/video/speech.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$script$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/script.js [app-ssr] (ecmascript)");
+// import { scrapedData } from '../../public/scrapedData';
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$examples$2f$jsm$2f$loaders$2f$GLTFLoader$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/three/examples/jsm/loaders/GLTFLoader.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$examples$2f$jsm$2f$loaders$2f$FontLoader$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/three/examples/jsm/loaders/FontLoader.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$examples$2f$jsm$2f$geometries$2f$TextGeometry$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/three/examples/jsm/geometries/TextGeometry.js [app-ssr] (ecmascript)");
@@ -130,6 +136,95 @@ function VideoPage() {
         'connections',
         'conversation',
         'nameTag'
+    ];
+    const listenButton = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const scrapedData = [
+        {
+            name: 'Xenia',
+            job: 'Google',
+            location: 'DCC',
+            rizz: 'has'
+        },
+        {
+            name: 'Matthew',
+            job: 'not crashing out',
+            location: 'Idk',
+            education: 'top tier',
+            rizz: 'yup'
+        },
+        {
+            name: 'CJ',
+            job: 'survive',
+            location: '??',
+            hobby: 'hackathons',
+            rizz: 'yes'
+        },
+        {
+            name: 'Dakshesh',
+            hobbies: 'legos an shi',
+            lastVacationTrip: 'beach',
+            rizz: 'rizzy'
+        },
+        {
+            name: 'Shankar',
+            favoriteFood: 'McDonalds',
+            favoriteDance: 'breakdance',
+            rizz: 'yur'
+        },
+        {
+            name: 'Devan',
+            job: 'McDonalds',
+            location: 'McDonalds',
+            rizzLevel: 'decent'
+        },
+        {
+            name: 'Aaryan',
+            job: 'being a cracked networker',
+            money: 'up',
+            rizz: 'unfathomable'
+        },
+        {
+            name: 'Ethan',
+            job: 'McDonalds',
+            location: 'idk bruh this just example data',
+            rizz: 'perchance'
+        },
+        {
+            name: 'Tobias',
+            job: 'McDonalds',
+            location: 'idk bruh this just example data',
+            rizz: '7 rizzes'
+        },
+        {
+            name: 'Lala',
+            job: 'McDonalds',
+            location: 'idk bruh this just example data',
+            rizz: 'Ok'
+        },
+        {
+            name: 'Jackson',
+            job: 'McDonalds',
+            location: 'idk bruh this just example data',
+            rizz: 'extra'
+        },
+        {
+            name: 'Caleb',
+            job: 'McDonalds',
+            location: 'idk bruh this just example data',
+            rizz: 'super'
+        },
+        {
+            name: 'Suyash',
+            job: 'McDonalds',
+            location: 'idk bruh this just example data',
+            rizz: 'rizz'
+        },
+        {
+            name: 'Jodie',
+            job: 'McDonalds',
+            location: 'idk bruh this just example data',
+            rizz: 'blizz'
+        }
     ];
     const { text, listening, awake, startListen, stopListen } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$video$2f$speech$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useSpeechToText"])({
         silenceMs: 2500,
@@ -190,85 +285,323 @@ function VideoPage() {
             three.camera.updateProjectionMatrix();
         }
     }
-    function setUpCamera() {
-        landmarkData.hands = new window.Hands({
+    /*
+	function setUpCamera(){
+
+		landmarkData.hands = new window.Hands({
+			locateFile: (file: string) =>
+				`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+		});
+
+		landmarkData.hands.setOptions({
+			maxNumHands: 2,
+			modelComplexity: 1,
+			minDetectionConfidence: 0.7,
+			minTrackingConfidence: 0.5,
+		});
+		
+		const canvas = canvasRef.current!;
+		const ctx = canvas.getContext('2d')!;
+		let cubeObject = profileList[0].threeShape;
+
+		landmarkData.hands.onResults((results: any) => {
+			ctx.save();
+			// ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+
+			if (results.multiHandLandmarks) {
+
+				let chosenHand = 'Left';
+				let data = null;
+				//asd
+				for(let i = 0; i < results.multiHandedness.length; i++)
+					if(results.multiHandedness[i].label == chosenHand) data = results.multiHandLandmarks[results.multiHandedness[i].index];
+
+				if(data != null){
+					if(profileList.length > 0 && three.camera){
+						
+						let landmark = results.multiHandLandmarks[0][8]; // index fingertip
+						let projectionData = projectLandmark(landmark);
+						let landmark2 = results.multiHandLandmarks[0][4];
+
+
+						let flatLandmarkData = {
+							x1: landmark.x*canvas.width, 
+							y1: landmark.y*canvas.height,
+							x2: landmark2.x*canvas.width, 
+							y2: landmark2.y*canvas.height
+						}
+
+
+						ctx.lineWidth = 10;
+						ctx.beginPath();
+						ctx.moveTo(flatLandmarkData.x1, flatLandmarkData.y1);
+						ctx.lineTo(flatLandmarkData.x2, flatLandmarkData.y2);
+						ctx.stroke();
+
+						let dist = Math.sqrt((flatLandmarkData.x1-flatLandmarkData.x2)*(flatLandmarkData.x1-flatLandmarkData.x2) + (flatLandmarkData.y1-flatLandmarkData.y2)*(flatLandmarkData.y1-flatLandmarkData.y2));
+						landmarkData.smoothing.pinchDist.push(dist);
+						let avgDist = listAverage(landmarkData.smoothing.pinchDist);
+
+
+						cubeObject.rotation.x = avgDist / 100;
+						cubeObject.rotation.y = avgDist / 100;
+						cubeObject.rotation.z = avgDist / 100;
+
+						//x is 1 to -1 ish
+						//y is 1 to -1
+						
+						let pinchedDist = (100+ ((0.9-projectionData.ndcZ)*720)) + 20;
+						if(dist < pinchedDist){
+							let newMove = smoothMove(profileList[0].threeShape, projectionData.ndcX, projectionData.ndcY, projectionData.ndcZ);
+							let ndc = new THREE.Vector3(newMove.avgX, newMove.avgY, newMove.avgZ);
+							ndc.unproject(three.camera);
+							cubeObject.position.copy(ndc);
+						}
+
+					}
+				}
+
+				for (const landmarks of results.multiHandLandmarks) {
+					window.drawConnectors(ctx, landmarks, window.HAND_CONNECTIONS, {
+						color: '#00FF00',
+						lineWidth: 2,
+					});
+					window.drawLandmarks(ctx, landmarks, {
+						color: '#FF0000',
+						lineWidth: 1,
+					});
+				}
+			}
+			ctx.restore();
+		});
+
+		handsRef.current = landmarkData.hands;
+
+		landmarkData.camera = new window.Camera(videoRef.current!, {
+			onFrame: async () => {
+				await landmarkData.hands.send({ image: videoRef.current! });
+			},
+			width: 640,
+			height: 480,
+		});
+
+		cameraRef.current = landmarkData.camera;
+		landmarkData.camera.start();
+
+
+
+
+
+
+
+
+
+
+		// if (!window.FaceMesh || !window.Camera) return;
+
+		// let video = videoRef.current!;
+
+		// let faceMesh = new window.FaceMesh({
+		// 	locateFile: (file: string) =>
+		// 		`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
+		// });
+
+		// faceMesh.setOptions({
+		// 	maxNumFaces: 1,
+		// 	refineLandmarks: true,
+		// 	minDetectionConfidence: 0.5,
+		// 	minTrackingConfidence: 0.5,
+		// });
+
+		// faceMesh.onResults((results: any) => {
+		// 	// ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		// // Draw mirrored video
+		// ctx.save();
+		// ctx.scale(-1, 1);
+		// ctx.drawImage(results.image, -canvas.width, 0, canvas.width, canvas.height);
+		// ctx.restore();
+
+		// // Draw glowing dots
+		// if (!results.multiFaceLandmarks?.length) return;
+
+		// let landmarks = results.multiFaceLandmarks[0];
+
+		// landmarks.forEach((lm: any) => {
+		// 	const x = canvas.width - lm.x * canvas.width;
+		// 	const y = lm.y * canvas.height;
+
+		// 	const gradient = ctx.createRadialGradient(x, y, 0, x, y, 10);
+		// 	gradient.addColorStop(0, "rgba(0,255,255,1)");
+		// 	gradient.addColorStop(1, "rgba(0,255,255,0)");
+
+		// 	ctx.fillStyle = gradient;
+		// 	ctx.beginPath();
+		// 	ctx.arc(x, y, 5, 0, Math.PI * 2);
+		// 	ctx.fill();
+		// });
+		// });
+
+		// const camera = new window.Camera(video, {
+		// onFrame: async () => {
+		// 		await faceMesh.send({ image: video });
+		// 	},
+		// 	width: 640,
+		// 	height: 480,
+		// });
+
+		// camera.start();
+		
+
+	}
+*/ function setUpCamera() {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        const video = videoRef.current;
+        let cubeObject = profileList[0].threeShape;
+        // storage for latest results
+        let latestHands = null;
+        let latestFace = null;
+        // ============================================================
+        // 1. HANDS MODEL
+        // ============================================================
+        const hands = new window.Hands({
             locateFile: (file)=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
         });
-        landmarkData.hands.setOptions({
+        hands.setOptions({
             maxNumHands: 2,
             modelComplexity: 1,
             minDetectionConfidence: 0.7,
             minTrackingConfidence: 0.5
         });
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        let cubeObject = profileList[0].threeShape;
-        landmarkData.hands.onResults((results)=>{
-            ctx.save();
-            ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
-            if (results.multiHandLandmarks) {
-                let chosenHand = 'Left';
-                let data = null;
-                //asd
-                for(let i = 0; i < results.multiHandedness.length; i++)if (results.multiHandedness[i].label == chosenHand) data = results.multiHandLandmarks[results.multiHandedness[i].index];
-                if (data != null) {
-                    if (profileList.length > 0 && three.camera) {
-                        let landmark = results.multiHandLandmarks[0][8]; // index fingertip
-                        let projectionData = projectLandmark(landmark);
-                        let landmark2 = results.multiHandLandmarks[0][4];
-                        let flatLandmarkData = {
-                            x1: landmark.x * canvas.width,
-                            y1: landmark.y * canvas.height,
-                            x2: landmark2.x * canvas.width,
-                            y2: landmark2.y * canvas.height
-                        };
-                        ctx.lineWidth = 10;
-                        ctx.beginPath();
-                        ctx.moveTo(flatLandmarkData.x1, flatLandmarkData.y1);
-                        ctx.lineTo(flatLandmarkData.x2, flatLandmarkData.y2);
-                        ctx.stroke();
-                        let dist = Math.sqrt((flatLandmarkData.x1 - flatLandmarkData.x2) * (flatLandmarkData.x1 - flatLandmarkData.x2) + (flatLandmarkData.y1 - flatLandmarkData.y2) * (flatLandmarkData.y1 - flatLandmarkData.y2));
-                        landmarkData.smoothing.pinchDist.push(dist);
-                        let avgDist = listAverage(landmarkData.smoothing.pinchDist);
-                        cubeObject.rotation.x = avgDist / 100;
-                        cubeObject.rotation.y = avgDist / 100;
-                        cubeObject.rotation.z = avgDist / 100;
-                        //x is 1 to -1 ish
-                        //y is 1 to -1
-                        let pinchedDist = 100 + (0.9 - projectionData.ndcZ) * 720 + 20;
-                        if (dist < pinchedDist) {
-                            let newMove = smoothMove(profileList[0].threeShape, projectionData.ndcX, projectionData.ndcY, projectionData.ndcZ);
-                            let ndc = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Vector3"](newMove.avgX, newMove.avgY, newMove.avgZ);
-                            ndc.unproject(three.camera);
-                            cubeObject.position.copy(ndc);
-                        }
-                    }
-                }
-                for (const landmarks of results.multiHandLandmarks){
-                    window.drawConnectors(ctx, landmarks, window.HAND_CONNECTIONS, {
-                        color: '#00FF00',
-                        lineWidth: 2
-                    });
-                    window.drawLandmarks(ctx, landmarks, {
-                        color: '#FF0000',
-                        lineWidth: 1
-                    });
-                }
-            }
-            ctx.restore();
+        hands.onResults((results)=>{
+            latestHands = results; // ← store only
         });
-        handsRef.current = landmarkData.hands;
-        landmarkData.camera = new window.Camera(videoRef.current, {
+        // ============================================================
+        // 2. FACE MESH MODEL
+        // ============================================================
+        const faceMesh = new window.FaceMesh({
+            locateFile: (file)=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+        });
+        faceMesh.setOptions({
+            maxNumFaces: 1,
+            refineLandmarks: true,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+        faceMesh.onResults((results)=>{
+            latestFace = results; // ← store only
+        });
+        // ============================================================
+        // 3. ONE CAMERA THAT FEEDS BOTH
+        // ============================================================
+        const camera = new window.Camera(video, {
             onFrame: async ()=>{
-                await landmarkData.hands.send({
-                    image: videoRef.current
+                await hands.send({
+                    image: video
                 });
+                await faceMesh.send({
+                    image: video
+                });
+                drawFrame(); // ← draw everything here
             },
             width: 640,
             height: 480
         });
-        cameraRef.current = landmarkData.camera;
-        landmarkData.camera.start();
+        camera.start();
+        // ============================================================
+        // 4. THE RENDER PIPELINE (the FIX)
+        // ============================================================
+        function drawFrame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            //
+            // 1. MIRROR CONTEXT FOR EVERYTHING
+            //
+            ctx.save();
+            ctx.scale(-1, 1);
+            ctx.translate(-canvas.width, 0);
+            //
+            // 2. DRAW VIDEO (mirrored!)
+            //
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            //
+            // 3. DRAW HAND LANDMARKS (mirrored!)
+            //
+            if (latestHands?.multiHandLandmarks) {
+                const results = latestHands;
+                // Your pinch + cube logic still works because it's in canvas space
+                let chosenHand = "Left";
+                let data = null;
+                for(let i = 0; i < results.multiHandedness.length; i++){
+                    if (results.multiHandedness[i].label === chosenHand) {
+                        data = results.multiHandLandmarks[results.multiHandedness[i].index];
+                    }
+                }
+                if (data != null && profileList.length > 0 && three.camera) {
+                    let lm = results.multiHandLandmarks[0][8];
+                    let lm2 = results.multiHandLandmarks[0][4];
+                    // SAME coordinates (canvas now mirrored)
+                    const flat = {
+                        x1: lm.x * canvas.width,
+                        y1: lm.y * canvas.height,
+                        x2: lm2.x * canvas.width,
+                        y2: lm2.y * canvas.height
+                    };
+                    ctx.lineWidth = 10;
+                    ctx.beginPath();
+                    ctx.moveTo(flat.x1, flat.y1);
+                    ctx.lineTo(flat.x2, flat.y2);
+                    ctx.stroke();
+                    let dist = Math.hypot(flat.x1 - flat.x2, flat.y1 - flat.y2);
+                    landmarkData.smoothing.pinchDist.push(dist);
+                    const avgDist = listAverage(landmarkData.smoothing.pinchDist);
+                    cubeObject.rotation.x = avgDist / 100;
+                    cubeObject.rotation.y = avgDist / 100;
+                    cubeObject.rotation.z = avgDist / 100;
+                    const projectionData = projectLandmark(lm);
+                    let pinchedDist = 100 + (0.9 - projectionData.ndcZ) * 720 + 20;
+                    if (dist < pinchedDist) {
+                        let newMove = smoothMove(profileList[0].threeShape, projectionData.ndcX, projectionData.ndcY, projectionData.ndcZ);
+                        let ndc = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Vector3"](newMove.avgX, newMove.avgY, newMove.avgZ);
+                        ndc.unproject(three.camera);
+                        cubeObject.position.copy(ndc);
+                    }
+                }
+                // draw all hands
+                for (const lm of results.multiHandLandmarks){
+                    window.drawConnectors(ctx, lm, window.HAND_CONNECTIONS, {
+                        color: "#00FF00",
+                        lineWidth: 2
+                    });
+                    window.drawLandmarks(ctx, lm, {
+                        color: "#FF0000",
+                        lineWidth: 1
+                    });
+                }
+            }
+            //
+            // 4. DRAW FACE LANDMARKS (mirrored!)
+            //
+            if (latestFace?.multiFaceLandmarks) {
+                const landmarks = latestFace.multiFaceLandmarks[0];
+                if (landmarks) landmarks.forEach((lm)=>{
+                    const x = lm.x * canvas.width; // <— NO canvas.width - x
+                    const y = lm.y * canvas.height;
+                    const g = ctx.createRadialGradient(x, y, 0, x, y, 10);
+                    g.addColorStop(0, "rgba(0,255,255,1)");
+                    g.addColorStop(1, "rgba(0,255,255,0)");
+                    ctx.fillStyle = g;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+            //
+            // 5. RESTORE (leave canvas normal for next frame)
+            //
+            ctx.restore();
+        }
     }
     function createScene() {
         three.scene = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Scene"]();
@@ -624,51 +957,11 @@ function VideoPage() {
             loadData(tempData);
         });
     }
-    function drawFace() {
-        if (!window.FaceMesh || !window.Camera) return;
-        let video = videoRef.current;
-        let canvas = canvasRef.current;
-        let ctx = canvas.getContext("2d");
-        let faceMesh = new window.FaceMesh({
-            locateFile: (file)=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
-        });
-        faceMesh.setOptions({
-            maxNumFaces: 1,
-            refineLandmarks: true,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
-        });
-        faceMesh.onResults((results)=>{
-            // Draw mirrored video
-            ctx.save();
-            ctx.scale(-1, 1);
-            ctx.drawImage(results.image, -canvas.width, 0, canvas.width, canvas.height);
-            ctx.restore();
-            // Draw glowing dots
-            if (!results.multiFaceLandmarks?.length) return;
-            let landmarks = results.multiFaceLandmarks[0];
-            landmarks.forEach((lm)=>{
-                const x = canvas.width - lm.x * canvas.width;
-                const y = lm.y * canvas.height;
-                const gradient = ctx.createRadialGradient(x, y, 0, x, y, 10);
-                gradient.addColorStop(0, "rgba(0,255,255,1)");
-                gradient.addColorStop(1, "rgba(0,255,255,0)");
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.arc(x, y, 5, 0, Math.PI * 2);
-                ctx.fill();
-            });
-        });
-        const camera = new window.Camera(video, {
-            onFrame: async ()=>{
-                await faceMesh.send({
-                    image: video
-                });
-            },
-            width: 640,
-            height: 480
-        });
-        camera.start();
+    function toggleListen() {
+        if (listening) stopListen();
+        else startListen();
+        console.log(listening);
+        console.log(text);
     }
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         document.body.style.overflow = "hidden";
@@ -677,19 +970,10 @@ function VideoPage() {
         if ("TURBOPACK compile-time truthy", 1) return;
         //TURBOPACK unreachable
         ;
-        // createCube(1);
-        // loadErryThang(scrapedData);
-        // animate();
         let conversation;
     }, []);
-    // check Listening
-    // sample scraping
-    // Fix box animations
+    // voice
     // add lines between connections
-    // tween sample info
-    // hand controls
-    // face detection
-    // Nicer UI
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$script$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -697,7 +981,7 @@ function VideoPage() {
                 strategy: "beforeInteractive"
             }, void 0, false, {
                 fileName: "[project]/app/video/page.tsx",
-                lineNumber: 756,
+                lineNumber: 984,
                 columnNumber: 4
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$script$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -705,7 +989,7 @@ function VideoPage() {
                 strategy: "beforeInteractive"
             }, void 0, false, {
                 fileName: "[project]/app/video/page.tsx",
-                lineNumber: 760,
+                lineNumber: 988,
                 columnNumber: 4
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$script$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -713,7 +997,7 @@ function VideoPage() {
                 strategy: "beforeInteractive"
             }, void 0, false, {
                 fileName: "[project]/app/video/page.tsx",
-                lineNumber: 764,
+                lineNumber: 992,
                 columnNumber: 4
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$script$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -721,7 +1005,7 @@ function VideoPage() {
                 strategy: "beforeInteractive"
             }, void 0, false, {
                 fileName: "[project]/app/video/page.tsx",
-                lineNumber: 768,
+                lineNumber: 996,
                 columnNumber: 4
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$script$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -729,7 +1013,7 @@ function VideoPage() {
                 strategy: "beforeInteractive"
             }, void 0, false, {
                 fileName: "[project]/app/video/page.tsx",
-                lineNumber: 769,
+                lineNumber: 997,
                 columnNumber: 4
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -741,7 +1025,7 @@ function VideoPage() {
                         onWheel: scrollDataList
                     }, void 0, false, {
                         fileName: "[project]/app/video/page.tsx",
-                        lineNumber: 772,
+                        lineNumber: 1000,
                         columnNumber: 5
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -752,14 +1036,14 @@ function VideoPage() {
                                 ref: videoRef,
                                 style: {
                                     display: 'none',
-                                    transform: 'scaleX(-1)'
+                                    transform: 'scaleX(1)'
                                 },
                                 width: "640",
                                 height: "480",
                                 playsInline: true
                             }, void 0, false, {
                                 fileName: "[project]/app/video/page.tsx",
-                                lineNumber: 774,
+                                lineNumber: 1002,
                                 columnNumber: 6
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("canvas", {
@@ -767,17 +1051,17 @@ function VideoPage() {
                                 width: "640",
                                 height: "480",
                                 style: {
-                                    transform: 'scaleX(-1)'
+                                    transform: 'scaleX(1)'
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/app/video/page.tsx",
-                                lineNumber: 781,
+                                lineNumber: 1009,
                                 columnNumber: 6
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/video/page.tsx",
-                        lineNumber: 773,
+                        lineNumber: 1001,
                         columnNumber: 5
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -786,13 +1070,23 @@ function VideoPage() {
                         onWheel: scrollInfoList
                     }, void 0, false, {
                         fileName: "[project]/app/video/page.tsx",
-                        lineNumber: 790,
+                        lineNumber: 1018,
+                        columnNumber: 5
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        className: "listenButton",
+                        ref: listenButton,
+                        onClick: toggleListen,
+                        children: "Listen"
+                    }, void 0, false, {
+                        fileName: "[project]/app/video/page.tsx",
+                        lineNumber: 1019,
                         columnNumber: 5
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/video/page.tsx",
-                lineNumber: 771,
+                lineNumber: 999,
                 columnNumber: 4
             }, this)
         ]

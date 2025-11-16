@@ -5,7 +5,7 @@
   "static/chunks/node_modules_three_build_three_module_0c59ee63.js",
   "static/chunks/node_modules_three_examples_jsm_4bcf95a6._.js",
   "static/chunks/node_modules_next_e0b52579._.js",
-  "static/chunks/_0ae61c3b._.js"
+  "static/chunks/app_video_3475778e._.js"
 ],
     source: "dynamic"
 });
