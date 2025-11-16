@@ -1,5 +1,6 @@
 node_modules
 
-/app/video/scrapedData.tsx
+app/video/scrapedData.tsx
 git rm --cached app/video/scrapedData.tsx
+
 git rm -r --cached app/video/
