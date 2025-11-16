@@ -1,0 +1,298 @@
+/* [project]/app/landing/style.module.css [app-client] (css) */
+body, html {
+  scroll-behavior: smooth;
+  color: #f0f0f0;
+  background: linear-gradient(#0a0a0a, #1a1a1a);
+  margin: 0;
+  padding: 0;
+  font-family: Inter, sans-serif;
+}
+
+.style-module__iVVawa__hoverableCard {
+  transition: transform .25s, box-shadow .25s;
+}
+
+.style-module__iVVawa__hoverableButton {
+  transition: all .25s;
+}
+
+.style-module__iVVawa__hoverableText {
+  transition: color .25s, text-shadow .25s;
+}
+
+.style-module__iVVawa__header1 {
+  letter-spacing: 2px;
+  color: #0ff;
+  margin-bottom: 16px;
+  font-size: 4rem;
+  font-weight: 800;
+}
+
+.style-module__iVVawa__header2 {
+  letter-spacing: 1px;
+  color: #0ff;
+  margin-bottom: 16px;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.style-module__iVVawa__header3 {
+  color: #0ff;
+  margin-bottom: 12px;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.style-module__iVVawa__subHeader {
+  color: #c0f7ff;
+  margin-bottom: 32px;
+  font-size: 1.5rem;
+}
+
+@keyframes style-module__iVVawa__pulse {
+  0%, 100% {
+    opacity: .1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: .15;
+    transform: scale(1.05);
+  }
+}
+
+.style-module__iVVawa__featureCard, .style-module__iVVawa__priceCard, .style-module__iVVawa__testimonialCard {
+  text-align: center;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  background: rgba(0, 255, 255, .05);
+  border-radius: 16px;
+  flex: 280px;
+  max-width: 320px;
+  padding: 24px;
+}
+
+.style-module__iVVawa__price {
+  color: #0ff;
+  margin: 12px 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+@keyframes style-module__iVVawa__floatOverlay {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-10px);
+  }
+}
+
+.style-module__iVVawa__cover4 {
+  background-image: url("https://picsum.photos/1200/600?random=13");
+}
+
+.style-module__iVVawa__cta {
+  text-align: center;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  background: rgba(0, 255, 255, .05);
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  display: flex;
+}
+
+@media (max-width: 768px) {
+  .style-module__iVVawa__heroContent h1 {
+    font-size: 3rem;
+  }
+
+  .style-module__iVVawa__heroContent p {
+    font-size: 1.25rem;
+  }
+
+  .style-module__iVVawa__featureCard, .style-module__iVVawa__priceCard, .style-module__iVVawa__testimonialCard, .style-module__iVVawa__overlayInfo {
+    flex: 100%;
+    max-width: 100%;
+  }
+
+  .style-module__iVVawa__coverSection {
+    height: auto;
+    padding: 60px 20px;
+  }
+}
+
+.style-module__iVVawa__landingPage {
+  color: #f0f0f0;
+  scroll-behavior: smooth;
+  background: linear-gradient(#0a0a0a, #1a1a1a);
+  font-family: Inter, sans-serif;
+}
+
+.style-module__iVVawa__hoverableCard:hover {
+  transform: translateY(-6px)scale(1.02);
+  box-shadow: 0 0 40px rgba(0, 255, 255, .35);
+}
+
+.style-module__iVVawa__hoverableButton:hover {
+  background: rgba(0, 255, 255, .1);
+  transform: scale(1.08);
+}
+
+.style-module__iVVawa__hoverableText:hover {
+  color: #0ff;
+  text-shadow: 0 0 8px #0ff;
+  cursor: default;
+}
+
+.style-module__iVVawa__hero {
+  text-align: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.style-module__iVVawa__heroContent {
+  z-index: 2;
+  max-width: 800px;
+  padding: 0 20px;
+}
+
+.style-module__iVVawa__heroOverlay {
+  z-index: 1;
+  background: linear-gradient(135deg, rgba(0, 255, 255, .1), rgba(0, 255, 255, .05));
+  width: 100%;
+  height: 100%;
+  animation: 8s ease-in-out infinite style-module__iVVawa__pulse;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.style-module__iVVawa__heroContent h1 {
+  letter-spacing: 2px;
+  color: #0ff;
+  margin-bottom: 16px;
+  font-size: 4rem;
+  font-weight: 700;
+}
+
+.style-module__iVVawa__heroContent p {
+  color: #c0f7ff;
+  margin-bottom: 32px;
+  font-size: 1.5rem;
+}
+
+.style-module__iVVawa__heroContent button {
+  color: #0ff;
+  cursor: pointer;
+  background: none;
+  border: 2px solid #0ff;
+  border-radius: 12px;
+  padding: 14px 48px;
+  font-size: 1.25rem;
+  transition: all .3s;
+}
+
+section {
+  width: 100%;
+  position: relative;
+}
+
+.style-module__iVVawa__featureGrid, .style-module__iVVawa__pricingGrid, .style-module__iVVawa__testimonialGrid {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 32px;
+  display: flex;
+}
+
+.style-module__iVVawa__featureCard, .style-module__iVVawa__priceCard, .style-module__iVVawa__testimonialCard {
+  text-align: center;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  background: rgba(0, 255, 255, .05);
+  border-radius: 16px;
+  flex: 280px;
+  max-width: 320px;
+  padding: 24px;
+  transition: all .3s;
+}
+
+.style-module__iVVawa__featureCard img {
+  object-fit: cover;
+  border-radius: 12px;
+  width: 100%;
+  height: 150px;
+  margin-bottom: 12px;
+}
+
+.style-module__iVVawa__priceCard.style-module__iVVawa__popular {
+  border: 2px solid #0ff;
+}
+
+.style-module__iVVawa__coverSection {
+  text-align: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+  padding: 0 20px;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.style-module__iVVawa__overlayInfo {
+  z-index: 2;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  background: rgba(0, 255, 255, .05);
+  border-radius: 16px;
+  max-width: 600px;
+  padding: 40px 24px;
+  animation: 6s ease-in-out infinite alternate style-module__iVVawa__floatOverlay;
+  position: relative;
+}
+
+.style-module__iVVawa__cover1 {
+  background-image: url("https://picsum.photos/1200/600?random=10");
+}
+
+.style-module__iVVawa__cover2 {
+  background-image: url("https://picsum.photos/1200/600?random=11");
+}
+
+.style-module__iVVawa__cover3 {
+  background-image: url("https://picsum.photos/1200/600?random=12");
+}
+
+@media (max-width: 768px) {
+  .style-module__iVVawa__heroContent h1 {
+    font-size: 3rem;
+  }
+
+  .style-module__iVVawa__heroContent p {
+    font-size: 1.25rem;
+  }
+
+  .style-module__iVVawa__featureCard, .style-module__iVVawa__priceCard, .style-module__iVVawa__testimonialCard, .style-module__iVVawa__overlayInfo {
+    flex: 100%;
+    max-width: 100%;
+  }
+
+  .style-module__iVVawa__coverSection {
+    height: auto;
+    padding: 60px 20px;
+  }
+}
+
+/*# sourceMappingURL=app_landing_style_module_eed12980.css.map*/

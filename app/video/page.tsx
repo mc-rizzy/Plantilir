@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useSpeechToText } from "./speech";
 import Script from 'next/script';
 
 import * as THREE from 'three';
@@ -17,18 +18,23 @@ export default function VideoPage() {
 	const nodeVelocities: Record<string, THREE.Vector3> = {};
 	const ignoreParameters = ['id', 'threeShape', 'connections', 'conversation'] as any;
 
+	const { text, listening, awake, startListen, stopListen } = useSpeechToText({
+		silenceMs: 2500,   // auto-stop after 2.5s silence
+		wakeWord: "hey app"
+	});
+
 	let animationId = useRef<number | null>(null);
 
 	let profileList = [] as any;
 	let testData = [
 		{name: 'billyBobJones', hobbies: 'eating'},
-		{name: 'sarah', hobbies: 'feasting'},
-		{name: 'neek', hobbies: 'pooping'},
-		{name: 'sal', hobbies: 'anime'},
-		{name: 'ellie', hobbies: 'asdf'},
-		{name: 'mark', hobbies: 'nah'},
-		{name: 'john', hobbies: 'idk'},
-		{name: 'dudeyMcDudeMan', hobbies: 'frfr'},
+		// {name: 'sarah', hobbies: 'feasting'},
+		// {name: 'neek', hobbies: 'pooping'},
+		// {name: 'sal', hobbies: 'anime'},
+		// {name: 'ellie', hobbies: 'asdf'},
+		// {name: 'mark', hobbies: 'nah'},
+		// {name: 'john', hobbies: 'idk'},
+		// {name: 'dudeyMcDudeMan', hobbies: 'frfr'},
 	];
 
 	const scrollData = {
@@ -109,7 +115,7 @@ export default function VideoPage() {
 		
 		const canvas = canvasRef.current!;
 		const ctx = canvas.getContext('2d')!;
-		let cubeObject = three.objects[0];
+		let cubeObject = profileList[0].threeShape;
 
 		landmarkData.hands.onResults((results: any) => {
 			ctx.save();
@@ -125,7 +131,7 @@ export default function VideoPage() {
 					if(results.multiHandedness[i].label == chosenHand) data = results.multiHandLandmarks[results.multiHandedness[i].index];
 
 				if(data != null){
-					if(three.objects.length > 0 && three.camera){
+					if(profileList.length > 0 && three.camera){
 						
 						let landmark = results.multiHandLandmarks[0][8]; // index fingertip
 						let projectionData = projectLandmark(landmark);
@@ -158,11 +164,13 @@ export default function VideoPage() {
 						//x is 1 to -1 ish
 						//y is 1 to -1
 						
-
-						let newMove = smoothMove(three.objects[0], projectionData.ndcX, projectionData.ndcY, projectionData.ndcZ);
-						let ndc = new THREE.Vector3(newMove.avgX, newMove.avgY, newMove.avgZ);
-						ndc.unproject(three.camera);
-						cubeObject.position.copy(ndc);
+						let pinchedDist = (100+ ((0.9-projectionData.ndcZ)*720)) + 20;
+						if(dist < pinchedDist){
+							let newMove = smoothMove(profileList[0].threeShape, projectionData.ndcX, projectionData.ndcY, projectionData.ndcZ);
+							let ndc = new THREE.Vector3(newMove.avgX, newMove.avgY, newMove.avgZ);
+							ndc.unproject(three.camera);
+							cubeObject.position.copy(ndc);
+						}
 
 					}
 				}
@@ -274,15 +282,8 @@ export default function VideoPage() {
 			console.error("Could not find valid JSON object delimiters '{' and '}' in the string.");
 			return null;
 		}
-
-		// Extract the potential JSON string
 		let jsonString = text.substring(startIndex, endIndex + 1);
 
-		// console.log("--- Extracted String ---");
-		// console.log(jsonString);
-		// console.log("------------------------");
-
-		// The core parsing operation:
 		let parsedData = JSON.parse(jsonString);
 		return parsedData;
 	}
@@ -306,9 +307,10 @@ export default function VideoPage() {
 			let dataString = tempData;
 			let geminiedObject = await getGemini(`Here is a JSON object:${dataString}. Add some JSON data to this object of the profile of ${tempData.name} (especially identifiable information) based on the following conversation: "${tempData.conversation}". Return only a JSON object.`);
 			let parsedJSONObject = parseGeminiJSON(geminiedObject);
-			console.log(parsedJSONObject)
-			// tempData = parsedJSONObject;
-			tempData = { ...tempData, ...parsedJSONObject };
+
+			let tempShape = tempData.threeShape;
+			// tempData = { ...parsedJSONObject, ...tempData };
+			tempData.threeShape = tempShape;
 		}
 
 		return tempData;
@@ -376,6 +378,7 @@ export default function VideoPage() {
 		for(let i = 0; i < tempData.length; i++){
 			await createProfile(tempData[i]);	
 		}
+		setUpCamera();
 	}
 
 	async function createProfile(data:any){
@@ -405,9 +408,9 @@ export default function VideoPage() {
 		(tempCube as any).xList = [];
 		(tempCube as any).yList = [];
 		three.objects.push(tempCube);
-		if(three.scene)	three.scene.add(tempCube);
 
-		if(!tempData.threeShape) tempData.threeShape = tempCube;
+		tempData.threeShape = tempCube;
+		if(three.scene)	three.scene.add(tempData.threeShape);
 
 		return tempData;
 	}
@@ -419,24 +422,54 @@ export default function VideoPage() {
 			let y = profileList[i].threeShape.position.y;
 			let z = profileList[i].threeShape.position.z;
 
-
+			if(profileList[i].name=="Mac") {
+				console.log(profileList[i].threeShape.position)
+				profileList[i].threeShape.position.x = Math.random();
+				// if(three.scene) three.scene.remove(profileList[i].threeShape);
+			}
 
 			let connections = profileList[i].connections;
+
+			let avgX = 0;
+			let avgY = 0;
+			let avgZ = 0;
 			for(let t = 0; t < connections.length; t++){
-				let connection = findId(connections[t].id);
-				// connection.name;
-				// connection.threeShape.position.x
-				// connection.threeShape.position.y
-				// connection.threeShape.position.z
+				let connection = findId(connections[t].id).threeShape.position;
+				avgX+=connection.x;
+				avgY+=connection.y;
+				avgZ+=connection.z;
+
+				let dist = Math.sqrt( (connection.x-x)*(connection.x-x) + (connection.y-y)*(connection.y-y) + (connection.z-z)*(connection.z-z) );
+				if(dist > 0.3){
+					// x= x+((connection.x-x)*0.1);
+					// y= y+((connection.y-y)*0.1);
+					// z= z+((connection.z-z)*0.1);
+
+					x+= ((connection.x-x)*0.5);
+					y+= ((connection.y-y)*0.5);
+					z+= ((connection.z-z)*0.5);
+				}
 			}
+
+			// x = x+(avgX-x)/5;
+			// y = y+(avgY-y)/5;
+			// z = z+(avgZ-z)/5;
 
 			for(let t = 0; t < profileList.length; t++){
-				let shape = profileList[i].threeShape;
-				// shape.x
-				// shape.y
-				// shape.z
-			}
+				let shape = profileList[i].threeShape.position;
 
+				let dist = Math.sqrt( (shape.x-x)*(shape.x-x) + (shape.y-y)*(shape.y-y) + (shape.z-z)*(shape.z-z) );
+				if(dist < 100){
+					// x+= ((shape.x-x)*1.5);
+					// y+= ((shape.y-y)*1.5);
+					// z+= ((shape.z-z)*1.5);
+
+
+					// x+= ((1/dist)*0.1);
+					// y+= ((1/dist)*0.1);
+					// z+= ((1/dist)*0.1);
+				}
+			}
 			
 			if(z > 2) z = 2;
 			profileList[i].threeShape.position.x = x;
@@ -586,17 +619,27 @@ export default function VideoPage() {
 
 
 		createScene();
-		createCube(1);
+		// createCube(1);
 
 		loadData(testData);
 		animate();
 
 		let conversation = "Hello, How are you doing? I'm doing well, I just got back from my trip to SodaCity Beach. My work phone number is 123456789 and my middle name is BobbyMcBob. My favorite food is donuts and I work at Pipes Inc. I am actually the Senior manager of cooling."
 		createProfile({name: 'Mac', hobbies:'racing cars', id:'78666-23145', conversation: conversation});
-		// createInfo({name: 'Mac', hobbies:'racing cars', id:'78666-23145'}, true)
+
+
+		window.setTimeout(function(){
+			for(let i = 0; i < profileList.length; i++){
+				profileList[i].threeShape.position.x = Math.random()*10 - 5;
+				profileList[i].threeShape.position.y = Math.random()*10 - 5;
+				profileList[i].threeShape.position.z = Math.random()*10 - 5;
+			}
+		},1000);
+
+		startListen();
+
 		
 		
-		setUpCamera();
 
 		return () => {
 			landmarkData.hands.close();
@@ -606,12 +649,16 @@ export default function VideoPage() {
 		};
 	}, []);
 
-	// Create UI
-	// Nice visualizer
-	// load in dataset
-	//hand controls
-	//conversation analyzer
-	//add in to database
+
+
+	// check Listening
+	// Fix box animations
+	// add lines between connections
+
+	// Get judges information
+	// hand controls
+
+	// Nicer UI
 
 
 	return (
@@ -653,118 +700,3 @@ export default function VideoPage() {
 		</>
 	);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const ThreeJSPage = () => {
-
-
-	
-
-// 	useEffect(() => {
-
-
-// 		const scene = new THREE.Scene();
-// 		const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-// 		const renderer = new THREE.WebGLRenderer();
-
-// 		renderer.setSize(window.innerWidth, window.innerHeight);
-// 		if (canvasRef.current) canvasRef.current.appendChild(renderer.domElement); // Append the canvas to the ref
-
-// 		const groundGeometry = new THREE.PlaneGeometry(10, 100);
-// 		const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x7cfc00 });
-// 		const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-// 		ground.rotation.x = -Math.PI / 2;
-// 		ground.position.x = 0;
-// 		scene.add(ground);
-
-// 		const characterGeometry = new THREE.BoxGeometry(0.5, 1, 0.5);
-// 		const characterMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-// 		const character = new THREE.Mesh(characterGeometry, characterMaterial);
-// 		character.position.y = 0.5;
-// 		character.position.z = 2;
-// 		character.position.x = 0;
-// 		scene.add(character);
-
-// 		camera.position.z = 5;
-// 		camera.position.y = 2;
-// 		camera.lookAt(character.position);
-
-// 		function removeKey(key: string) {
-// 			keys = keys.filter(k => k !== key);
-// 			blockedKeys.push(key);
-// 		}
-		
-
-// 		var blockedKeys: any[] = [];
-// 		const listenKeyDown = function(event: { key: any; }){ if (!keys.includes(event.key.toLowerCase()) && !blockedKeys.includes(event.key.toLowerCase())) keys.push(event.key.toLowerCase());}
-// 		const listenKeyUp = function(event: { key: any; }){ keys = keys.filter(key => key !== event.key.toLowerCase()); blockedKeys = blockedKeys.filter(key => key !== event.key.toLowerCase()); }
-
-// 		const resize = function() {
-// 			if (canvasRef.current && canvasRef.current.children.length > 0) {
-// 				const canvas = renderer.domElement;
-// 				canvas.style.width = window.innerWidth+'px';
-// 				canvas.style.height = window.innerHeight+'px';
-
-// 				camera.aspect = canvas.clientWidth / canvas.clientHeight;
-// 				camera.updateProjectionMatrix();
-// 			}
-// 		}
-// 		window.addEventListener('keydown', listenKeyDown);
-// 		window.addEventListener('keyup', listenKeyUp);
-// 		window.addEventListener('resize', resize)
-
-
-
-// 		function makeCustomBox(width: number | undefined, height: number | undefined, depth: number | undefined, x: any, y: any, z: any){
-// 			var tempGeometry = new THREE.BoxGeometry(width, height, depth);
-// 			var tempMaterial = new THREE.MeshBasicMaterial({ color: `rgb(${Math.round(Math.random()*255)},${Math.round(Math.random()*255)},${Math.round(Math.random()*255)})` });
-// 			var temp = new THREE.Mesh(tempGeometry, tempMaterial);
-// 			temp.position.y = x;
-// 			temp.position.z = y;
-// 			temp.position.x = z;
-// 			scene.add(temp);
-// 			return temp;
-// 		}
-// 		function makeModel(id: number, x: any, y: any, z: any){
-// 			var temp = new THREE.Mesh(map.presets[id].geometry,  map.presets[id].material);
-// 			temp.position.y = x;
-// 			temp.position.z = y;
-// 			temp.position.x = z;
-// 			scene.add(temp);
-// 			return temp;
-// 		}
-
-// 		};
-
-// 		animate();
-
-// 		return () => {
-// 			if (canvasRef.current) canvasRef.current.removeChild(renderer.domElement);
-// 			window.removeEventListener('keydown', listenKeyDown);
-// 			window.removeEventListener('keyup', listenKeyUp);
-// 			window.removeEventListener('resize', resize);
-// 			if (animationId.current) cancelAnimationFrame(animationId.current);
-// 		};
-// 	}, []);
-
-// 	return (
-// 		<div ref={canvasRef} style={{ width: '100%', height: '100vh' }}></div>
-// 	);
-// };
-
-// export default ThreeJSPage;

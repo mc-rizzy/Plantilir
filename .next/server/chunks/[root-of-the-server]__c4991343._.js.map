@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
+    {"offset": {"line": 163, "column": 0}, "map": {"version":3,"sources":["file:///Users/gooooooooooooner/Documents/Code/Plantilir/app/api/gemini/route.js"],"sourcesContent":["\nimport { GoogleGenAI } from \"@google/genai\";\n\nexport async function POST(request) {\n  const ai = new GoogleGenAI({ apiKey: process.env.GEMAPI });\n\n  // let prompt = 'make a short catchphrase about gooning. Return just the phrase.';\n  let prompt = await request.json();\n\n  const response = await ai.models.generateContent({\n    model: \"gemini-2.5-flash\",\n    contents: prompt.prompt,\n  });\n\n  let geminiAnswer = response.text;\n\n  return new Response(JSON.stringify({ geminiAnswer }), {\n      status: 200,\n    });\n}"],"names":[],"mappings":";;;;AACA;;AAEO,eAAe,KAAK,OAAO;IAChC,MAAM,KAAK,IAAI,4KAAW,CAAC;QAAE,QAAQ,QAAQ,GAAG,CAAC,MAAM;IAAC;IAExD,kFAAkF;IAClF,IAAI,SAAS,MAAM,QAAQ,IAAI;IAE/B,MAAM,WAAW,MAAM,GAAG,MAAM,CAAC,eAAe,CAAC;QAC/C,OAAO;QACP,UAAU,OAAO,MAAM;IACzB;IAEA,IAAI,eAAe,SAAS,IAAI;IAEhC,OAAO,IAAI,SAAS,KAAK,SAAS,CAAC;QAAE;IAAa,IAAI;QAClD,QAAQ;IACV;AACJ","debugId":null}}]
+}

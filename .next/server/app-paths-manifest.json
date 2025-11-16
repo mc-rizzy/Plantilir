@@ -1,0 +1,10 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/gemini/route": "app/api/gemini/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/landing/page": "app/landing/page.js",
+  "/page": "app/page.js",
+  "/sign/page": "app/sign/page.js",
+  "/sign2/page": "app/sign2/page.js",
+  "/video/page": "app/video/page.js"
+}
